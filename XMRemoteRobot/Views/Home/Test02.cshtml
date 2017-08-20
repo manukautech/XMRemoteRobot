@@ -1,0 +1,226 @@
+
+@{
+    ViewData["Title"] = "Test02";
+}
+
+<div id="circle" style="position:absolute; top: 200px; left:50px; width:320px;height:320px; background-color:lightgreen; border-radius: 160px"></div>
+
+<h2>Test02</h2>
+
+@*20170722 JPC Nested layout*@
+<div class="row">
+    <div class="col-md-6" id="xform">
+        <label>Human Commander:</label>
+        <div style="height:410px">
+            Move the mouse pointer - or touch - inside the green circle.
+        </div>
+
+        <div class="row">
+            <div class="col-md-2"><label>Drive Status</label></div>
+            <div class="col-md-3"><div id="driveStatus" style="border:2px solid grey;width:300px;"></div> </div>
+        </div>
+        <div class="row">
+            <div class="col-md-2"><label>Confirm Server Action</label></div>
+            <div class="col-md-3"><div id="confirmSend" style="border:2px solid grey;width:300px;"></div> </div>
+        </div>
+        <hr />
+        <div class="row">
+            <div class="col-md-2"><label>MessageId</label></div>
+            <div class="col-md-3"><input type="text" id="MessageId" value="-1" readonly /></div>
+        </div>
+        <div class="row">
+            <div class="col-md-2"><label>CategoryId</label></div>
+            <div class="col-md-3"><input type="text" id="CategoryId" value="1" /></div>
+        </div>
+        <div class="row">
+            <div class="col-md-2"><label>CommanderId</label></div>
+            <div class="col-md-3"><input type="text" id="CommanderId" value="1001" /></div>
+        </div>
+        <div class="row">
+            <div class="col-md-2"><label>RobotId</label></div>
+            <div class="col-md-3"><input type="text" id="RobotId" value="1002" /></div>
+        </div>
+        <div class="row">
+            <div class="col-md-2"><label>XData</label></div>
+            <div class="col-md-3"><input type="text" id="XData" value='{"leftmotor": 80, "rightmotor": 100}' /> </div>
+        </div>
+        <div class="row">
+            <div class="col-md-2"><label>IsLog</label></div>
+            <div class="col-md-3"><input type="text" id="IsLog" value="false" /></div>
+        </div>
+        <div class="row">
+            <div class="col-md-2"><label>AccessKey</label></div>
+            <div class="col-md-3"><input type="text" id="AccessKey" value="mock-security-key-for-demo-only" /></div>
+        </div>
+        <div class="row">
+            <div class="col-md-2">&nbsp;</div>
+            <div class="col-md-3">
+                <!--<input type="button" value="Send Command" onclick="AJAXSubmit();" />
+                <br /><br /> -->
+                <input type="button" value="Stop Test UI RHS" onclick="NoIframe();" />
+            </div>
+        </div>
+        <hr />
+ 
+    </div>
+
+    @*New parent column to display robot simulator on the right on medium to large screens*@
+    <div id="robotContainer" class="col-md-6">
+        <label>Robot Client:</label><br />
+
+        This video (1 min 46 sec) <br />
+        <a target="_blank" href="https://www.youtube.com/watch?v=dGFSwtsQrS8">https://www.youtube.com/watch?v=dGFSwtsQrS8</a> <br />
+        shows how the light patches work with light dependent resistors (LDRs)<br />
+        
+        <br />
+        The display below is a different webpage in an "iframe" to provide separation from the "commander".<br /><br />
+        <iframe id="robotIframe" src="/emulators/robotRat01.html" width="480" height="640"></iframe>
+    </div>
+
+</div>
+
+
+@*20170319 JPC get more flexible about deployment in website sub-folders defined as apps
+    by "dropping" the ~ operator into HTML in a way that JavaScript can get to it*@
+<input id="rootDirectory" type="hidden" value="@Url.Content("~/")" />
+
+
+<script type="text/javascript">
+    var oeCircle, oeDriveStatus;
+    var _timer;
+    var _xmlhttp;
+    var _isNoIframe = false;
+    var _isInProgress = false;
+    var _prevTime = Date.now();
+    var _prevwx = 0;
+    var _prevwy = 0;
+    var _wx = 0;
+    var _wy = 0;
+
+    window.onload = function () {
+        oeDriveStatus = document.getElementById("driveStatus");
+        window.onmousemove = function (e) {
+            _wx = e.clientX;
+            _wy = e.clientY;
+            Poll();        } 
+    }
+
+    function Poll() {
+        //Check for work in progress and no change in command
+        //with an exception for no action for 1.5 seconds (1500 milliseconds).
+        var timeSinceLastCall = Date.now() - _prevTime;
+        //oeDriveStatus.value = timeSinceLastCall;
+        if (_isInProgress && timeSinceLastCall < 1500) return;
+        if (_wx == _prevwx && _wy == _prevwy && timeSinceLastCall < 1500) return;
+
+        //set status tracking values
+        _prevwx = _wx;
+        _prevwy = _wy;
+        _isInProgress = true;
+
+        x = Math.round((_wx - 210) * 100 / 160);
+        y = Math.round((360 -_wy) * 100 / 160);
+        //check that we are in the circle
+        if (Math.sqrt(x * x + y * y) > 100) {
+            oeDriveStatus.innerHTML = "Out of range - RAW (" + _wx + ", " + _wy + ")";
+            x = 0;
+            y = 0;
+        }
+        oeDriveStatus.innerHTML = "(" + x + ", " + y + ")";
+        var leftDrive = y + x;
+        if (leftDrive > 100) leftDrive = 100;
+        var rightDrive = y - x;
+        if (rightDrive > 100) rightDrive = 100;
+        var vx1x1, vx1x2, vx2x1, vx2x2;
+
+        if (leftDrive >= 0) {
+            vx1x1 = leftDrive;
+            vx2x1 = 0;
+        } else {
+            vx1x1 = 0;
+            vx2x1 = -leftDrive;
+        } 
+
+        if (rightDrive >= 0) {
+            vx1x2 = rightDrive;
+            vx2x2 = 0;
+        } else {
+            vx1x2 = 0;
+            vx2x2 = -rightDrive;
+        } 
+
+        var command = "{ \"vx1x1\":{0}, \"vx1x2\":{1}, \"vx2x1\":{2}, \"vx2x2\":{3}}";
+        command = command.replace("{0}", vx1x1);
+        command = command.replace("{1}", vx1x2);
+        command = command.replace("{2}", vx2x1);
+        command = command.replace("{3}", vx2x2);
+        document.getElementById("XData").value = command;
+
+        AjaxSubmit();
+    }
+    
+    //AJAX!  ref  http://www.w3schools.com/ajax/ajax_xmlhttprequest_create.asp
+    // Start by creating the xmlhttp object in Javascript to replace the older "form" methods
+    function AjaxSubmit() {
+        _xmlhttp = new XMLHttpRequest();
+        //Note that with callback to a separate function, use function name only as in "XCallback" NOT "XCallback()"
+        _xmlhttp.onreadystatechange = XCallback;
+
+        var requestString = document.getElementById("rootDirectory").value + "Home/XTest01/";
+        //alert("requestString = " + requestString);
+        var postString = "";
+        var inputs = document.getElementsByTagName("input");
+        for (i = 0; i < inputs.length; i++) {
+            //.getAttribute method from http://javascript-coder.com/javascript-form/getelementbyid-form.phtml
+            if (inputs[i].getAttribute('type') == "text") {
+                postString += inputs[i].id + "=" + inputs[i].value;
+                //AccessKey is the last input field of interest
+                if (inputs[i].id == "AccessKey") {
+                    break;
+                }
+                postString += "&";
+            }
+        }
+        //alert("postString = " + postString);
+
+        _xmlhttp.open("POST", requestString, true);
+        _xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+        _xmlhttp.send(postString);
+        _prevTime = Date.now();
+    }
+
+    function XCallback() {
+        //check that object _xmlhttp is ready
+        if (_xmlhttp.readyState != 4 || _xmlhttp.status != 200) {
+            return;
+        }
+        //display and/or check confirmation handshake then set timer for the next Poll
+        var rawMessage = _xmlhttp.responseText
+        document.getElementById("confirmSend").innerHTML = rawMessage;
+        //release lock on new polling
+        _isInProgress = false;
+        window.setTimeout(Poll, 200);
+    }
+
+
+    function NoIframe() {
+        //remove the test javascript robot (html page) from this user interface
+        var oeRobotIframe = document.getElementById("robotIframe");
+
+        //20170805 JPC avoid repeating showing this message
+        if (_isNoIframe) return;
+        _isNoIframe = true;
+
+        oeRobotIframe.src = "#";
+        oeRobotIframe.style.display = "none";
+        var oeRobotContainer = document.getElementById("robotContainer");
+        oeRobotContainer.innerHTML
+            += "Javascript Robot Simulation is now removed from this User Interface.<br/>"
+            + "You can test on a different device by navigating to <br />"
+            + "https://remoterobot.manukautech.info/r.html"
+            + "<br />";
+        oeRobotContainer.style.backgroundColor = "lightgrey";
+    }
+
+</script>
+

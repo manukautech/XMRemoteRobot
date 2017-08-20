@@ -1,0 +1,129 @@
+
+@{
+    ViewData["Title"] = "Test01";
+}
+
+<div class="container">
+    <h2>Test01</h2>
+
+    @*20170722 JPC Nested layout*@
+    <div class="row">
+        <div class="col-md-6" id="xform">
+            <label>Human Commander:</label>
+            <div class="row">
+                <div class="col-md-2"><label>MessageId</label></div>
+                <div class="col-md-3"><input type="text" id="MessageId" value="-1" readonly /></div>
+            </div>
+            <div class="row">
+                <div class="col-md-2"><label>CategoryId</label></div>
+                <div class="col-md-3"><input type="text" id="CategoryId" value="1" /></div>
+            </div>
+            <div class="row">
+                <div class="col-md-2"><label>CommanderId</label></div>
+                <div class="col-md-3"><input type="text" id="CommanderId" value="1001" /></div>
+            </div>
+            <div class="row">
+                <div class="col-md-2"><label>RobotId</label></div>
+                <div class="col-md-3"><input type="text" id="RobotId" value="1002" /></div>
+            </div>
+            <div class="row">
+                <div class="col-md-2"><label>XData</label></div>
+                <div class="col-md-3"><input type="text" id="XData" value='{"leftmotor": 80, "rightmotor": 100}' /> </div>
+            </div>
+            <div class="row">
+                <div class="col-md-2"><label>IsLog</label></div>
+                <div class="col-md-3"><input type="text" id="IsLog" value="false" /></div>
+            </div>
+            <div class="row">
+                <div class="col-md-2"><label>AccessKey</label></div>
+                <div class="col-md-3"><input type="text" id="AccessKey" value="mock-security-key-for-demo-only" /></div>
+            </div>
+            <div class="row">
+                <div class="col-md-2">&nbsp;</div>
+                <div class="col-md-3">
+                    <input type="button" value="Send Command" onclick="AJAXSubmit();" />
+                    <br /><br />
+                    <input type="button" value="Send Yellow Command" onclick="XColor('yellow');" /><br />
+                    <input type="button" value="Send Cyan Command" onclick="XColor('cyan');" />
+                    <br/><br />
+                    <input type="button" value="Stop Test UI RHS" onclick="NoIframe();" />
+                </div>
+            </div>
+            <hr />
+            <div class="row">
+                <div class="col-md-2"><label>Confirm Server Action</label></div>
+                <div class="col-md-3"><input type="text" id="confirmSend" readonly /></div>
+            </div>
+            <div id=""></div>
+        </div>
+        <div id="robotContainer" class="col-md-6">
+            <label>Robot Simulator:</label><br />
+            <iframe id="robotIframe" src="/emulators/robotSimulator01.html" width="550" height="600"></iframe>
+        </div>
+
+    </div>
+
+</div>
+
+@*20170319 JPC get more flexible about deployment in website sub-folders defined as apps
+    by "dropping" the ~ operator into HTML in a way that JavaScript can get to it*@
+<input id="rootDirectory" type="hidden" value="@Context.Request.PathBase/" />
+
+<script type="text/javascript">
+
+    //AJAX  ref  http://www.w3schools.com/ajax/ajax_xmlhttprequest_create.asp
+    // Start by creating the xmlhttp object in Javascript to replace the older "form" methods
+    function AJAXSubmit() {
+        var xmlhttp;
+        xmlhttp = new XMLHttpRequest();
+        xmlhttp.onreadystatechange = function () {
+            if (this.readyState == 4 && this.status == 200) {
+                document.getElementById("confirmSend").value = this.responseText;
+            }
+        };
+        var requestString = document.getElementById("rootDirectory").value + "Home/XTest01/";
+        //alert("requestString = " + requestString);
+        var postString = "";
+        var inputs = document.getElementsByTagName("input");
+        for (i = 0; i < inputs.length; i++) {
+            //.getAttribute method from http://javascript-coder.com/javascript-form/getelementbyid-form.phtml
+            if (inputs[i].getAttribute('type') == "text") {
+                postString += inputs[i].id + "=" + inputs[i].value;
+                //AccessKey is the last input field of interest
+                if (inputs[i].id == "AccessKey") {
+                    break;
+                }
+                postString += "&";
+            }
+        }
+        //alert("postString = " + postString);
+
+        xmlhttp.open("POST", requestString, true);
+        xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+        xmlhttp.send(postString);
+    }
+
+    function XColor(robotColor) {
+        var oeData = document.getElementById("XData");
+        //write the color command into the XData field
+        oeData.value = '{"color": ' + '"' + robotColor + '"}';
+        //send new data to the server
+        AJAXSubmit();
+    }
+
+    function NoIframe() {
+        //remove the test javascript robot (html page) from this user interface
+        var oeRobotIframe = document.getElementById("robotIframe");
+        oeRobotIframe.src = "#";
+        oeRobotIframe.style.display = "none";
+        var oeRobotContainer = document.getElementById("robotContainer");
+        oeRobotContainer.innerHTML
+            += "Javascript Robot Simulation is now removed from this User Interface.<br/>"
+            + "You can test on a different device by navigating to <br />"
+            + "https://remoterobot.manukautech.info/r.html"
+            + "<br />";
+        oeRobotContainer.style.backgroundColor = "lightgrey";
+    }
+
+</script>
+
