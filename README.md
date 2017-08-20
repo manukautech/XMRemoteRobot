@@ -1,11 +1,11 @@
 # XMRemoteRobot
 A web service app which enables remote-control of near and distant devices via HTTP including over the public Internet.
 
-About the name
-    X is for eXperimental or - as it matures - X-factor
-    M is for Manukau Institute of Technology - where we do teaching and learning and research
-    Remote means the capability for long distance over the public Internet
-    Robot means a wide range of devices
+About the name:
+    X is for eXperimental or - as it matures - X-factor.
+    M is for Manukau Institute of Technology - where we do teaching and learning and research.
+    Remote means the capability for long distance over the public Internet.
+    Robot means a wide range of devices.
 
 This is a "long polling" app. "Commanders" and "Collectors" (robots, receivers) can rapidly poll this server for updated signal messages. We are getting signal message delivery times as fast as 0.2 sec. If Commanders are pausing or slow then the server delays "no new message" responses by 2 to 4 sec.
 
