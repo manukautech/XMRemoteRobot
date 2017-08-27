@@ -1,11 +1,14 @@
 # XMRemoteRobot
 A web service app which enables remote-control of near and distant devices via HTTP including over the public Internet.
 
+Video:
+[https://www.youtube.com/watch?v=aVQCipqSoCs](https://www.youtube.com/watch?v=aVQCipqSoCs)
+
 This is a "long polling" app. "Commanders" and "Collectors" (robots, receivers) can rapidly poll this server for updated signal messages. We are getting signal message delivery times as fast as 0.2 sec. If Commanders are pausing or slow then the server delays "no new message" responses by 2 to 4 sec.
 
 The technology is Microsoft ASP.NET Core 1.1 with a Microsoft SQL Server Express database. The coding languages are C#, JavaScript, HTML, CSS and SQL. The project leader John Calder and the team starting this are lecturers and students at the Manukau Institute of Technology. This app and its related projects are spinoffs from our research, teaching and learning activities. 
 
-Run this on a Windows machine with Visual Studio 2017 installed. We use the "Community Edition" which is free of charge for education, individuals and small businesses. The code is setup to run the supplied database in folder "C:\Users\Public\LocalDB" which we find works quickly and easily on computers owned by individuals. To run elsewhere eg on a pen drive with this app, you need to edit file "appSettings.json".
+Run this on a Windows machine with Visual Studio 2017 installed. We use the "Community Edition" which is free of charge for education, individuals and small businesses. The code is setup to run the supplied database in folder "C:\Users\Public\LocalDB" which we find works quickly and easily on computers owned by individuals. To run elsewhere eg on a pen drive with this app, you need to edit file "appSettings.json". While in "appSettings.json" you need to change the "appAccessKey" from the demo to something secure.
 
 Remote Control with signal messaging is a much discussed area and software does exist. Why create this app? XMRemoteControl is focussed on being small and efficient by focussing on our particular robot remote control and telemetry needs - which may be your needs. The code is written to be clearly understandable so it can double as an education resource for the new ASP.NET Core technology. XMRemoteControl stays with HTTP which keeps it firewall friendly and working well in an education institute environment where more exotic socket communications are often blocked. HTTP keeps XMRemoteControl in the zone of machine-reading of json-formatted text from machine-friendly web pages a.k.a. web services which we think of as web pages for robots to look at.
 
