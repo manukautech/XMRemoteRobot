@@ -7,7 +7,7 @@
 <div class="row" style="white-space: nowrap; overflow-x: scroll">
     <img src="~/images/IMG_3304.JPG" style="height:200px;" />
     <img src="~/images/IMG_3307.JPG" style="height:200px;" />
-    <img src="~/images/Test02Circle.jpg" style="height:200px;"/>
+    <img src="~/images/Test02Circle.jpg" style="height:200px;" />
     <img src="~/images/Test02Moni.jpg" style="height:200px;" />
     <img src="~/images/Test02Patches.jpg" style="height:200px;" />
     <img src="~/images/IMG_3309.JPG" style="height:200px;" />
@@ -21,7 +21,7 @@
             <br />
             This app is the messaging server which currently enables remote-control via HTTP.
             That means we can control a wide range of distant devices over the public Internet as well the more common local area control.
-
+            <br /><br />
             We use this for operating our robots over the Internet.
         </p>
 
@@ -29,16 +29,25 @@
             Many of the devices we run, eg laptops and phones, cannot talk to each other directly over
             the public Internet. Our "Commanders" and "Collectors"(Receivers) need to connect as clients to this server system
             which receives and passes on their messages.
-
         </p>
 
+    </div>
+
+    <div class="col-md-6">
         <p>
             Pages "Test01" and "Test02", in the above menu, consist of 2 independent pages side by side
             to give a simulation of "commander"(left) and "collector/receiver"(right).
         </p>
         <p>
             "Test01" has buttons to send simple color change signals.<br />
-            "Test02" is the setup that we use to remote control our "creative rat" vehicle (images below).
+            "Test02" is the setup that we use to remote control our "creative rat" vehicle. Ref:<br />
+            <a target="_blank" href="https://www.youtube.com/watch?v=aVQCipqSoCs">https://www.youtube.com/watch?v=aVQCipqSoCs</a>
+        </p>
+        <p>
+            "Robot01" is for testing "Test01" with client devices eg phones.<br />
+            "Robot02" is for testing "Test02" with client devices eg phones.<br />
+            "Robot03" is standalone for testing the light patch effect on phones controlling servos. <br />
+            "Robot04" is standalone for testing the light patch effect on phones controlling simple DC motors.<br />
         </p>
 
         <p>
@@ -46,7 +55,10 @@
             The fastest send and receive rates are 0.2 to 0.5 sec. If Commanders are pausing or slow then
             the server delays "no new message" responses by 2 to 4 sec.
         </p>
-
+    </div>
+</div>
+<div class="row" style="font-family: Verdana; font-size:0.4cm; color: black">
+    <div class="col-md-6">
         <p>
             The blog:<br />
             <a href="https://hitechfromlotech.blogspot.com">https://hitechfromlotech.blogspot.com</a>
@@ -56,25 +68,9 @@
             The videos:<br />
             <a href="https://www.youtube.com/iafilm">https://www.youtube.com/iafilm</a>
         </p>
-
     </div>
-
     <div class="col-md-6">
-        <p>
-            Copyright © 2017 John Calder (Project Leader).<br />
-            This is an "Open Source" project. We apply the Apache Licence:<br />
-            http://www.apache.org/licenses/LICENSE-2.0
-            <br /><br />
-            Unless required by applicable law or agreed to in writing, software
-            distributed under the License is distributed on an "AS IS" BASIS,
-            WITHOUT WARRANTIES OF ANY KIND, either express or implied.
-            See the License for the specific language governing permissions and
-            limitations under the License.
-        </p>
-
-        <p>
-            This is an output from research at the Manukau Institute of Technology, Auckland, New Zealand
-        </p>
-
+        &nbsp;
     </div>
 </div>
+
