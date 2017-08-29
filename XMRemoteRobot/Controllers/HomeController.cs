@@ -36,14 +36,14 @@ namespace XMRemoteRobot.Controllers
 
         public IActionResult About()
         {
-            ViewData["Message"] = "Your application description page.";
+            ViewData["Message"] = "Contact and About";
 
-            return View();
+            return View("Contact");
         }
 
         public IActionResult Contact()
         {
-            ViewData["Message"] = "Your contact page.";
+            ViewData["Message"] = "Contact and About";
 
             return View();
         }
