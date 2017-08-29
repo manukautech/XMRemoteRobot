@@ -13,8 +13,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="wwwroot\emulators\robotServoTest.html">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
     <Content Include="wwwroot\emulators\robotRat01.html" />
     <Content Include="wwwroot\emulators\robotSimulator01.html" />
+    <Content Include="wwwroot\emulators\robotSnake01.html" />
     <Content Include="wwwroot\images\IMG_1154.JPG" />
     <Content Include="wwwroot\images\IMG_3304.JPG" />
     <Content Include="wwwroot\images\IMG_3307.JPG" />
