@@ -1,5 +1,4 @@
-﻿@inject Microsoft.ApplicationInsights.AspNetCore.JavaScriptSnippet JavaScriptSnippet
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8" />
@@ -8,8 +7,6 @@
 
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <link rel="stylesheet" href="~/css/site.css" />
-
-    @Html.Raw(JavaScriptSnippet.FullScript)
 </head>
 <body>
     <nav class="navbar navbar-inverse navbar-fixed-top">
@@ -28,10 +25,9 @@
                     <li><a asp-area="" asp-controller="Home" asp-action="Index">Home</a></li>
                     <li><a asp-area="" asp-controller="Home" asp-action="Test01">Test01</a></li>
                     <li><a asp-area="" asp-controller="Home" asp-action="Test02">Test02</a></li>
-                    <li><a href="~/emulators/robotSimulator01.html">Robot01</a></li>
-                    <li><a href="~/emulators/robotRat01.html">Robot02</a></li>
-                    <li><a href="~/emulators/robotServoTest.html">Robot03</a></li>
-                    <li><a href="~/emulators/robotSnake01.html">Robot04</a></li>
+                    <li><a href="~/emulators/Robot01.html">Robot01</a></li>
+                    <li><a href="~/emulators/Robot02.html">Robot02</a></li>
+                    <li><a href="~/emulators/Robot03.html">Robot03</a></li>
                     <li><a asp-area="" asp-controller="Home" asp-action="Contact">Contact</a></li>
                 </ul>
             </div>
@@ -41,17 +37,20 @@
         @RenderBody()
         <hr />
         <footer>
-            <p>&copy; 2017 John Calder as Project Leader - Open Source Licensing with 
-                <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache License 2.0</a></p>
+            <p>
+                &copy; 2017 John Calder as Project Leader - Open Source Licensing with
+                <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache License 2.0</a>
+            </p>
+
         </footer>
     </div>
 
-    <environment names="Development">
+    <environment include="Development">
         <script src="~/lib/jquery/dist/jquery.js"></script>
         <script src="~/lib/bootstrap/dist/js/bootstrap.js"></script>
         <script src="~/js/site.js" asp-append-version="true"></script>
     </environment>
-    <environment names="Staging,Production">
+    <environment exclude="Development">
         <script src="https://ajax.aspnetcdn.com/ajax/jquery/jquery-2.2.0.min.js"
                 asp-fallback-src="~/lib/jquery/dist/jquery.min.js"
                 asp-fallback-test="window.jQuery"
