@@ -7,12 +7,14 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 //20170712 JPC needed System.Data.SqlClient downloaded via NuGet
 using System.Data.SqlClient;
+using Microsoft.AspNetCore.Http;
 
 
 namespace XMRemoteRobot.Controllers
@@ -31,6 +33,23 @@ namespace XMRemoteRobot.Controllers
 
         public IActionResult Index()
         {
+            ViewData["Message"] = "";
+            if(HttpContext.Session.GetInt32("CommanderId") == null)
+            {
+                try
+                {
+                    HttpContext.Session.SetInt32("CommanderId", GetDemoCommanderId());
+                }
+                catch(Exception ex)
+                {
+                    ViewData["Message"] = ex.Message;
+                    HttpContext.Session.SetInt32("CommanderId", -1);
+                }
+            }
+            else if (!TestPageAccess())
+            {
+                ViewData["Message"] = "Too popular! Channels are all in use. Please try again later.";
+            }
             return View();
         }
 
@@ -50,13 +69,48 @@ namespace XMRemoteRobot.Controllers
 
         public IActionResult Test01()
         {
-            return View();
+            if (TestPageAccess())
+            {
+                return View();
+            }
+            else
+            {
+                return View("Index");
+            }
         }
 
         public IActionResult Test02()
         {
-            return View();
+            if (TestPageAccess())
+            {
+                return View();
+            }
+            else
+            {
+                return View("Index");
+            }
         }
+
+        private bool TestPageAccess()
+        {
+            int? commanderId = HttpContext.Session.GetInt32("CommanderId");
+            if (commanderId == null)
+            {
+                ViewData["Message"] = "";
+                return false;
+            }
+            else if (commanderId == -1)
+            {
+                ViewData["Message"] = "Too popular! Channels are all in use. Please try again later.";
+                return false;
+            }
+            else
+            {
+                ViewData["CommanderId"] = commanderId;
+                return true;
+            }
+        }
+
 
         //20170723 JPC this method XTest01() is ONLY for demos and casual testing with wider audiences.
         // The "real" master communication method is XSignal() further below
@@ -77,10 +131,12 @@ namespace XMRemoteRobot.Controllers
         }
 
         [HttpPost]
-        public string XSignal(int MessageId, int CategoryId 
-        ,int CommanderId, int RobotId, string XData, bool IsLog
-        ,string AccessKey)
+        public string XSignal(int MessageId, int CategoryId
+        , int CommanderId, int RobotId, string XData, bool IsLog
+        , string AccessKey)
         {
+            //20170909 JPC
+            if (RobotId <= 0) RobotId = CommanderId;
             Response.ContentType = "text/plain";
             //default general error message
             string response = "{\"status\": 20, \"errormessage\": \"process incomplete\"}";
@@ -93,7 +149,7 @@ namespace XMRemoteRobot.Controllers
             //20170712 JPC an additional injection line of defence, taking advantage of the way 
             //  our data is a protocol without coding characters like single quote mark or semicolon.
             //Note also the use of "parametrised" SQL below
-            if(XData.IndexOf("'") > -1 || XData.IndexOf(";") > -1)
+            if (XData.IndexOf("'") > -1 || XData.IndexOf(";") > -1)
             {
                 return "{\"status\":22, \"errormessage\": \"protocol syntax or format error\"}";
             }
@@ -110,18 +166,18 @@ namespace XMRemoteRobot.Controllers
                     break;
                 default:
                     return "{\"status\":23, \"errormessage\": \"this message has an unrecognised categoryid - we currently only support values of 1 for command-send - 2 for command-collect - and we are working on 3 for telemetry \" }";
-            }  
+            }
 
             return response;
         }
 
         private string XCommand(int CategoryId, int CommanderId, int RobotId, string Command, bool IsLog)
-        { 
+        {
             SqlConnection conn = new SqlConnection(_connectionString);
             SqlCommand cmd = new SqlCommand();
 
             //Support UK, NZ, AU English for "initialise" vs "initialize"
-            if(Command.IndexOf("initialise") > -1)
+            if (Command.IndexOf("initialise") > -1)
             {
                 Command.Replace("initialise", "initialize");
             }
@@ -147,7 +203,7 @@ namespace XMRemoteRobot.Controllers
             //Cleanup at every 30th connection
             string cleanupMessage = "";
             double xId = Convert.ToDouble(messageId);
-            if(Math.Round(xId/30) == xId/30)
+            if (Math.Round(xId / 30) == xId / 30)
             {
                 //20170806 JPC Prototype over-simplified cleanup. 
                 // TODO investigate why parametrization here is crashing
@@ -160,7 +216,7 @@ namespace XMRemoteRobot.Controllers
                 int rowsAffected = cmd.ExecuteNonQuery();
 
                 cleanupMessage = ", \"cutoffId\": " + cutoffId + ", \"rowsaffected\": " + rowsAffected;
-                
+
                 //Attempted better cleanup but not working and no error message on crash
                 //except one saying something like @p0 already in use 
                 //hence the trial with higher p numbers.
@@ -196,7 +252,7 @@ namespace XMRemoteRobot.Controllers
                     cleanupMessage = ", \"cutoffId\": " + cutoffId;
                     */
                 //end of table cleanup of usually temporary messages
-            // }
+                // }
             }
 
             string response = "{\"status\": 1, \"messageid\": " + messageId + cleanupMessage + "}";
@@ -245,7 +301,7 @@ namespace XMRemoteRobot.Controllers
                         reader.Read();
                         {
                             dbMessageId = reader.GetInt32(0);
-                            if(dbMessageId > MessageId )
+                            if (dbMessageId > MessageId)
                             {
                                 //New message received, respond immediately
 
@@ -258,8 +314,8 @@ namespace XMRemoteRobot.Controllers
                                  + ",\"command\":" + reader.GetString(4) + ",\"response\":{\"status\":-1, \"time\": \"" + HHmmss + "\"}}";
                                 //exit for loop
                                 exitTrigger = true;
-                            } 
-                            else if(i < iStop)
+                            }
+                            else if (i < iStop)
                             {
                                 delayTrigger = true;
                             }
@@ -279,17 +335,45 @@ namespace XMRemoteRobot.Controllers
                     }
                 }
                 cmd.Connection.Close();
-                if(exitTrigger) { break; }
+                if (exitTrigger) { break; }
 
-                if(delayTrigger)
+                if (delayTrigger)
                 {
                     //20170804 JPC EDUC discovered that for this to work it is essential
                     //that we place it outside of the block of code doing ADO.NET data access
                     System.Threading.Thread.Sleep(250);
                 }
-            }  
-
+            }
             return response;
+        }
+
+        //20170910 JPC manage CommanderId allocation to visitors
+        private int GetDemoCommanderId()
+        {
+            SqlConnection conn = new SqlConnection(_connectionString);
+            SqlCommand cmd = new SqlCommand();
+            cmd = conn.CreateCommand();
+            cmd.Connection.Open();
+
+            //Is the oldest session well expired?
+            string SQL = "SELECT TOP 1 DATEDIFF(minute, SessionDateTime, GETDATE()) AS SessionAge FROM DemoCommander ORDER BY SessionDateTime ASC";
+            cmd.CommandText = SQL;
+            int sessionAge = Convert.ToInt32(cmd.ExecuteScalar());
+            if(sessionAge < 60)
+            {
+                throw new Exception("This system is at full load with visitors doing trials. Please try again later.");
+            }
+
+            //Find the oldest DemoId
+            SQL = "SELECT TOP 1 DemoId FROM DemoCommander ORDER BY SessionDateTime ASC, DemoId ASC";
+            cmd.CommandText = SQL;
+            int demoId = Convert.ToInt32(cmd.ExecuteScalar());
+            //Update the datetime for the oldest DemoId
+            SQL = "UPDATE DemoCommander SET SessionDateTime = GETDATE() WHERE DemoId = " + demoId.ToString();
+            cmd.CommandText = SQL;
+            cmd.ExecuteNonQuery();
+            cmd.Connection.Close();
+            return demoId;
         }
     }
 }

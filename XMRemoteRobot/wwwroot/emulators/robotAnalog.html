@@ -1,0 +1,113 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <!--
+      Project XMRemoteRobot - example of client-side processing for a robot vehicle
+      Copyright © 2017 John Calder as project leader
+      Licensed under the "Open Source" Apache License, Version 2.0.
+      See file LICENSE in the parent project root.
+      In brief, a generous license with some attribution rights reserved.
+      Questions? Contact John via the parent app contact+about page.
+    -->
+
+
+    <meta name="viewport" content="width=device-width">
+    <!-- Code for "DroidScript" hybrid apps, comment-out for web-based
+     <script src='file:///android_asset/app.js'></script> -->
+
+    <script>
+
+        //Called after application is started.
+        function OnStart() {
+            document.getElementById("gx1x3").style.backgroundColor = "firebrick";
+            document.getElementById("gx2x3").style.backgroundColor = "firebrick";
+            servoProcess(50);
+        }
+
+        //20170824 JPC problem with stepping of light patch brightness rather than
+        //smooth changes. Introduced Math.round which fixed that.
+        function servoProcess(value) {
+            if (value > 50) {
+                setPatchLevel("gx1x1", Math.round((value - 50) * 255/50));
+                setPatchLevel("gx2x1", 0);
+            } else {
+                setPatchLevel("gx1x1", 0);
+                setPatchLevel("gx2x1", Math.round((50 - value) * 255/50));
+            }
+        }
+
+         
+		//setPatchLevel("gx1x1", y);
+		 function setPatchLevel(patchId, value) {
+            var patch = document.getElementById(patchId);
+			{
+                //20170815 7:58 PM Pratik allow for non-linear electric motor behaviour
+                // by applying an ellipse curve
+				//var y1 = [ (255*255) - (  (  (( value - 100)*( value - 100)) * (255*255) ) /10000) ];           
+				//var y = Math.round( Math.sqrt(y1));				
+                //console.log(value +"-"+y);
+			}			
+            patch.style.backgroundColor = "rgb(" + value + "," + value + "," + value + ")";
+            console.log(patch.style.backgroundColor);			
+        }
+
+    </script>
+
+    <style>
+        /*20170806 JPC
+            The font-size for selector * defines the em
+            and so sets all significant scaling
+            Fine-tune the font-size to get the light patches
+            to line up with the LDRs*/
+        /*TODO - alter this programmatically from a UI slider control*/
+        * {
+            font-family: Courier New, Courier, monospace;
+            font-size: 0.4cm;
+        }
+
+        body {
+            background-color: black;
+        }
+
+        /*3 x 2 simplest light patch design */
+        table {
+            position: absolute;
+            top: 15em;
+            width: 19.5em;
+            height: 13em;
+            /*gives thin blue line effect between cells, good for adjusting alignment with the LDRs*/
+            background-color: blue;
+        }
+
+        td {
+            box-sizing: border-box;
+            border: 2em solid black;
+            background-color: firebrick;
+            font-size: 0.4em;
+        }
+    </style>
+</head>
+
+<!-- variation from "DroidScript" where onload=app.onStart() -->
+<body onload="OnStart()">
+    <h3 style="color:white">Use Slider to test Servo etc</h3>
+    <p><input type="range" id="servo" value="50" onchange="servoProcess(this.value);" style="width:19.5em"></p>
+    <p style="color:white">
+    This is a simple self-contained<br />
+    utility (not remote control) <br />
+    that we use for quick testing<br />
+    on the robot.</p>
+    <table>
+        <tr>
+            <td id="gx1x1">gx1x1</td>
+            <td id="gx1x2">gx1x2</td>
+            <td id="gx1x3">gx1x3</td>
+        </tr>
+        <tr>
+            <td id="gx2x1">gx2x1</td>
+            <td id="gx2x2">gx2x2</td>
+            <td id="gx2x3">gx2x3</td>
+        </tr>
+    </table>
+</body>
+</html>

@@ -16,15 +16,19 @@
             </div>
             <div class="row">
                 <div class="col-md-2"><label>CategoryId</label></div>
-                <div class="col-md-3"><input type="text" id="CategoryId" value="1" /></div>
+                <div class="col-md-3"><input type="text" id="CategoryId" value="1" readonly/></div>
             </div>
+            <!-- 20170909 JPC
+                 CommanderId only is a simplification for demo purposes.
+                 The full protocol provides for separate CommanderId and RobotId.
+                 With use of CommanderId only: RobotId is the same as CommanderId.
+            -->
             <div class="row">
                 <div class="col-md-2"><label>CommanderId</label></div>
-                <div class="col-md-3"><input type="text" id="CommanderId" value="1001" /></div>
-            </div>
-            <div class="row">
-                <div class="col-md-2"><label>RobotId</label></div>
-                <div class="col-md-3"><input type="text" id="RobotId" value="1002" /></div>
+                <div class="col-md-3">
+                    <input type="text" id="CommanderId" value="@ViewData["CommanderId"]" readonly/>
+                    <input type="hidden" id="RobotId" value="0" />
+                </div>
             </div>
             <div class="row">
                 <div class="col-md-2"><label>XData</label></div>
@@ -45,8 +49,7 @@
                     <br /><br />
                     <input type="button" value="Send Yellow Command" onclick="XColor('yellow');" /><br />
                     <input type="button" value="Send Cyan Command" onclick="XColor('cyan');" />
-                    <br/><br />
-                    <input type="button" value="Stop Test UI RHS" onclick="NoIframe();" />
+                    <br />
                 </div>
             </div>
             <hr />
@@ -56,10 +59,17 @@
             </div>
             <div id=""></div>
         </div>
+        <div id="robotMessage" class="col-md-6" style="display:none">          
+        </div>
         <div id="robotContainer" class="col-md-6">
-            <label>Robot Simulator:</label><br />
-            The display below is a different webpage in an "iframe" to provide separation from the "commander".<br/><br />
-            <iframe id="robotIframe" src="@Url.Content("~/")emulators/robotSimulator01.html" width="550" height="600"></iframe>
+            Simulated Robot Client on this screen:<br />
+            <br />
+            The display below is a different webpage in an "iframe" to provide separation from the "Commander".<br />
+            <br />
+            Try this simulation first, then click the button to run with your own device or devices.<br />
+            <input type="button" value="Change to Device" onclick="NoIframe(true);" /><br />
+            <br /><br />
+            <iframe id="robotIframe" name="robotIframe" src="~/emulators/Robot01.html" width="500" height="600"></iframe>
         </div>
 
     </div>
@@ -71,6 +81,23 @@
 <input id="rootDirectory" type="hidden" value="@Url.Content("~/")" />
 
 <script type="text/javascript">
+    window.onload = function () {
+        //20170910 JPC config content in iframe from here in the parent.
+        //ref: https://www.w3schools.com/jsref/prop_frame_contentdocument.asp
+        //ref: https://developer.mozilla.org/en-US/docs/Web/API/GlobalEventHandlers/onload
+        document.getElementById("robotIframe").contentDocument.getElementById("CommanderId").value
+            = document.getElementById("CommanderId").value;
+
+        document.getElementById("robotMessage").innerHTML
+            = "The Robot Simulator iframe is now switched off.<br />"
+            + "You can test on a different device eg phone by navigating it to the root address of this same website: <br />"
+            + window.location.protocol + "//" + window.location.host + "/"
+            + "<br />then click on menu item 'Robot01'.<br />"
+            + "You will need to type your 'CommanderId' value into the device.<br />"
+            + "Your 'CommanderId' is <b>" + document.getElementById("CommanderId").value + "</b>"
+            + "<br /><br />"
+            + "<input type='button' value='Back to Simulation' onclick='NoIframe(false);' /><br/><br />";
+    }
 
     //AJAX  ref  http://www.w3schools.com/ajax/ajax_xmlhttprequest_create.asp
     // Start by creating the xmlhttp object in Javascript to replace the older "form" methods
@@ -88,7 +115,7 @@
         var inputs = document.getElementsByTagName("input");
         for (i = 0; i < inputs.length; i++) {
             //.getAttribute method from http://javascript-coder.com/javascript-form/getelementbyid-form.phtml
-            if (inputs[i].getAttribute('type') == "text") {
+            if (inputs[i].getAttribute('type') == "text" || inputs[i].getAttribute('type') == "hidden") {
                 postString += inputs[i].id + "=" + inputs[i].value;
                 //AccessKey is the last input field of interest
                 if (inputs[i].id == "AccessKey") {
@@ -112,18 +139,20 @@
         AJAXSubmit();
     }
 
-    function NoIframe() {
-        //remove the test javascript robot (html page) from this user interface
+    function NoIframe(isChange) {
+        //disable the test javascript robot (html page) from this user interface
+        //and prompt for the use of a device
         var oeRobotIframe = document.getElementById("robotIframe");
-        oeRobotIframe.src = "#";
-        oeRobotIframe.style.display = "none";
-        var oeRobotContainer = document.getElementById("robotContainer");
-        oeRobotContainer.innerHTML
-            += "Javascript Robot Simulation is now removed from this User Interface.<br/>"
-            + "You can test on a different device by navigating to <br />"
-            + window.location.protocol + "//" + window.location.host + "/r.html"
-            + "<br />";
-        oeRobotContainer.style.backgroundColor = "lightgrey";
+        var oeRobotMessage = document.getElementById("robotMessage");
+        var oeContainer = document.getElementById("robotContainer");
+        if (isChange) {
+            oeRobotIframe.src = "#";
+            oeContainer.style.display = "none";
+            oeRobotMessage.style.display = "block";
+            oeRobotMessage.style.backgroundColor = "lightgrey";
+        } else {
+            window.location.replace(window.location.href);
+        }
     }
 
 </script>

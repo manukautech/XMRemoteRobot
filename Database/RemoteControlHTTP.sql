@@ -60,6 +60,25 @@ CREATE TABLE [dbo].[MessageLog](
 ) ON [PRIMARY]
 
 GO
+
+/****** Object:  Table [dbo].[DemoCommander]    Script Date: 10/09/2017 4:36:06 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[DemoCommander](
+	[DemoId] [int] NOT NULL,
+	[SessionDateTime] [datetime] NOT NULL,
+	[SessionId] [varchar](256) NOT NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[DemoId] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+
+GO
+
+
 INSERT [dbo].[Category] ([CategoryId], [Description]) VALUES (1, N'Command Send')
 GO
 INSERT [dbo].[Category] ([CategoryId], [Description]) VALUES (2, N'Command Receive')
@@ -1815,14 +1834,104 @@ INSERT [dbo].[MessageLog] ([MessageId], [CategoryId], [CommanderId], [RobotId], 
 GO
 INSERT [dbo].[MessageLog] ([MessageId], [CategoryId], [CommanderId], [RobotId], [Command], [Response], [IsLog], [XTimeCommand], [XTimeResponse]) VALUES (9716, 1, 1001, 1002, N'{ "gx1x1":0, "gx1x2":0, "gx2x1":0, "gx2x2":0}', N'', 1, CAST(N'2017-08-06T22:09:43.133' AS DateTime), NULL)
 GO
+
+INSERT [dbo].[DemoCommander] ([DemoId], [SessionDateTime], [SessionId]) VALUES (10, CAST(N'2017-09-10T12:56:33.943' AS DateTime), N'')
+GO
+INSERT [dbo].[DemoCommander] ([DemoId], [SessionDateTime], [SessionId]) VALUES (11, CAST(N'2017-09-10T12:59:02.453' AS DateTime), N'')
+GO
+INSERT [dbo].[DemoCommander] ([DemoId], [SessionDateTime], [SessionId]) VALUES (12, CAST(N'2017-09-10T13:45:46.397' AS DateTime), N'')
+GO
+INSERT [dbo].[DemoCommander] ([DemoId], [SessionDateTime], [SessionId]) VALUES (13, CAST(N'2017-09-10T13:51:56.030' AS DateTime), N'')
+GO
+INSERT [dbo].[DemoCommander] ([DemoId], [SessionDateTime], [SessionId]) VALUES (14, CAST(N'2017-09-10T13:56:27.000' AS DateTime), N'')
+GO
+INSERT [dbo].[DemoCommander] ([DemoId], [SessionDateTime], [SessionId]) VALUES (15, CAST(N'2017-09-10T14:01:59.390' AS DateTime), N'')
+GO
+INSERT [dbo].[DemoCommander] ([DemoId], [SessionDateTime], [SessionId]) VALUES (16, CAST(N'2017-09-10T14:23:09.263' AS DateTime), N'')
+GO
+INSERT [dbo].[DemoCommander] ([DemoId], [SessionDateTime], [SessionId]) VALUES (17, CAST(N'2017-09-10T14:25:02.367' AS DateTime), N'')
+GO
+INSERT [dbo].[DemoCommander] ([DemoId], [SessionDateTime], [SessionId]) VALUES (18, CAST(N'2017-09-10T14:26:10.620' AS DateTime), N'')
+GO
+INSERT [dbo].[DemoCommander] ([DemoId], [SessionDateTime], [SessionId]) VALUES (19, CAST(N'2017-09-10T14:37:13.000' AS DateTime), N'')
+GO
+INSERT [dbo].[DemoCommander] ([DemoId], [SessionDateTime], [SessionId]) VALUES (20, CAST(N'2017-09-10T14:37:54.480' AS DateTime), N'')
+GO
+INSERT [dbo].[DemoCommander] ([DemoId], [SessionDateTime], [SessionId]) VALUES (21, CAST(N'2017-09-10T14:43:04.763' AS DateTime), N'')
+GO
+INSERT [dbo].[DemoCommander] ([DemoId], [SessionDateTime], [SessionId]) VALUES (22, CAST(N'2017-09-10T14:47:40.937' AS DateTime), N'')
+GO
+INSERT [dbo].[DemoCommander] ([DemoId], [SessionDateTime], [SessionId]) VALUES (23, CAST(N'2017-09-10T15:53:29.123' AS DateTime), N'')
+GO
+INSERT [dbo].[DemoCommander] ([DemoId], [SessionDateTime], [SessionId]) VALUES (24, CAST(N'2017-09-10T15:54:00.627' AS DateTime), N'')
+GO
+INSERT [dbo].[DemoCommander] ([DemoId], [SessionDateTime], [SessionId]) VALUES (25, CAST(N'2017-09-10T15:56:36.157' AS DateTime), N'')
+GO
+INSERT [dbo].[DemoCommander] ([DemoId], [SessionDateTime], [SessionId]) VALUES (26, CAST(N'2017-09-10T16:09:45.097' AS DateTime), N'')
+GO
+INSERT [dbo].[DemoCommander] ([DemoId], [SessionDateTime], [SessionId]) VALUES (27, CAST(N'2017-09-10T16:16:35.177' AS DateTime), N'')
+GO
+INSERT [dbo].[DemoCommander] ([DemoId], [SessionDateTime], [SessionId]) VALUES (28, CAST(N'2017-09-10T16:22:14.360' AS DateTime), N'')
+GO
+INSERT [dbo].[DemoCommander] ([DemoId], [SessionDateTime], [SessionId]) VALUES (29, CAST(N'2000-01-01T00:00:00.000' AS DateTime), N'')
+GO
+INSERT [dbo].[DemoCommander] ([DemoId], [SessionDateTime], [SessionId]) VALUES (30, CAST(N'2000-01-01T00:00:00.000' AS DateTime), N'')
+GO
+INSERT [dbo].[DemoCommander] ([DemoId], [SessionDateTime], [SessionId]) VALUES (31, CAST(N'2000-01-01T00:00:00.000' AS DateTime), N'')
+GO
+INSERT [dbo].[DemoCommander] ([DemoId], [SessionDateTime], [SessionId]) VALUES (32, CAST(N'2000-01-01T00:00:00.000' AS DateTime), N'')
+GO
+INSERT [dbo].[DemoCommander] ([DemoId], [SessionDateTime], [SessionId]) VALUES (33, CAST(N'2000-01-01T00:00:00.000' AS DateTime), N'')
+GO
+INSERT [dbo].[DemoCommander] ([DemoId], [SessionDateTime], [SessionId]) VALUES (34, CAST(N'2000-01-01T00:00:00.000' AS DateTime), N'')
+GO
+INSERT [dbo].[DemoCommander] ([DemoId], [SessionDateTime], [SessionId]) VALUES (35, CAST(N'2000-01-01T00:00:00.000' AS DateTime), N'')
+GO
+INSERT [dbo].[DemoCommander] ([DemoId], [SessionDateTime], [SessionId]) VALUES (36, CAST(N'2000-01-01T00:00:00.000' AS DateTime), N'')
+GO
+INSERT [dbo].[DemoCommander] ([DemoId], [SessionDateTime], [SessionId]) VALUES (37, CAST(N'2000-01-01T00:00:00.000' AS DateTime), N'')
+GO
+INSERT [dbo].[DemoCommander] ([DemoId], [SessionDateTime], [SessionId]) VALUES (38, CAST(N'2000-01-01T00:00:00.000' AS DateTime), N'')
+GO
+INSERT [dbo].[DemoCommander] ([DemoId], [SessionDateTime], [SessionId]) VALUES (39, CAST(N'2000-01-01T00:00:00.000' AS DateTime), N'')
+GO
+INSERT [dbo].[DemoCommander] ([DemoId], [SessionDateTime], [SessionId]) VALUES (40, CAST(N'2000-01-01T00:00:00.000' AS DateTime), N'')
+GO
+INSERT [dbo].[DemoCommander] ([DemoId], [SessionDateTime], [SessionId]) VALUES (41, CAST(N'2000-01-01T00:00:00.000' AS DateTime), N'')
+GO
+INSERT [dbo].[DemoCommander] ([DemoId], [SessionDateTime], [SessionId]) VALUES (42, CAST(N'2000-01-01T00:00:00.000' AS DateTime), N'')
+GO
+INSERT [dbo].[DemoCommander] ([DemoId], [SessionDateTime], [SessionId]) VALUES (43, CAST(N'2000-01-01T00:00:00.000' AS DateTime), N'')
+GO
+INSERT [dbo].[DemoCommander] ([DemoId], [SessionDateTime], [SessionId]) VALUES (44, CAST(N'2000-01-01T00:00:00.000' AS DateTime), N'')
+GO
+INSERT [dbo].[DemoCommander] ([DemoId], [SessionDateTime], [SessionId]) VALUES (45, CAST(N'2000-01-01T00:00:00.000' AS DateTime), N'')
+GO
+INSERT [dbo].[DemoCommander] ([DemoId], [SessionDateTime], [SessionId]) VALUES (46, CAST(N'2000-01-01T00:00:00.000' AS DateTime), N'')
+GO
+INSERT [dbo].[DemoCommander] ([DemoId], [SessionDateTime], [SessionId]) VALUES (47, CAST(N'2000-01-01T00:00:00.000' AS DateTime), N'')
+GO
+INSERT [dbo].[DemoCommander] ([DemoId], [SessionDateTime], [SessionId]) VALUES (48, CAST(N'2000-01-01T00:00:00.000' AS DateTime), N'')
+GO
+INSERT [dbo].[DemoCommander] ([DemoId], [SessionDateTime], [SessionId]) VALUES (49, CAST(N'2000-01-01T00:00:00.000' AS DateTime), N'')
+
 ALTER TABLE [dbo].[Message]  WITH CHECK ADD  CONSTRAINT [FK_Message_Category] FOREIGN KEY([CategoryId])
 REFERENCES [dbo].[Category] ([CategoryId])
 GO
+
 ALTER TABLE [dbo].[Message] CHECK CONSTRAINT [FK_Message_Category]
 GO
+
 ALTER TABLE [dbo].[MessageLog]  WITH CHECK ADD  CONSTRAINT [FK_MessageLog_Category] FOREIGN KEY([CategoryId])
 REFERENCES [dbo].[Category] ([CategoryId])
 GO
+
 ALTER TABLE [dbo].[MessageLog] CHECK CONSTRAINT [FK_MessageLog_Category]
 GO
+
+ALTER TABLE [dbo].[DemoCommander] ADD  DEFAULT ('2000-01-01') FOR [SessionDateTime]
+GO
+ALTER TABLE [dbo].[DemoCommander] ADD  DEFAULT ('') FOR [SessionId]
+GO
+
 

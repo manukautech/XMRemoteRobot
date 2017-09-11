@@ -18,9 +18,9 @@ textarea {
     width: 290px;
 }
 
-input[type="button"] {
-    width: 210px;
-}
+    input[type="button"] {
+        width: 210px;
+    }
 
 /* Carousel */
 .carousel-caption p {
@@ -40,4 +40,3 @@ input[type="button"] {
         display: none;
     }
 }
-

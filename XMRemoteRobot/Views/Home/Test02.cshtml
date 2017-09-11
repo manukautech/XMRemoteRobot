@@ -30,15 +30,17 @@
         </div>
         <div class="row">
             <div class="col-md-2"><label>CategoryId</label></div>
-            <div class="col-md-3"><input type="text" id="CategoryId" value="1" /></div>
+            <div class="col-md-3"><input type="text" id="CategoryId" value="1" readonly /></div>
         </div>
+        <!-- 20170909 JPC
+             CommanderId only is a simplification for demo purposes. 
+             The full protocol provides for separate CommanderId and RobotId.
+             With use of CommanderId only: RobotId is the same as CommanderId.
+        -->
         <div class="row">
             <div class="col-md-2"><label>CommanderId</label></div>
-            <div class="col-md-3"><input type="text" id="CommanderId" value="1001" /></div>
-        </div>
-        <div class="row">
-            <div class="col-md-2"><label>RobotId</label></div>
-            <div class="col-md-3"><input type="text" id="RobotId" value="1002" /></div>
+            <div class="col-md-3">
+            <input type="text" id="CommanderId" value="@ViewData["CommanderId"]" readonly/></div>
         </div>
         <div class="row">
             <div class="col-md-2"><label>XData</label></div>
@@ -52,31 +54,33 @@
             <div class="col-md-2"><label>AccessKey</label></div>
             <div class="col-md-3"><input type="text" id="AccessKey" value="mock-security-key-for-demo-only" /></div>
         </div>
+
         <div class="row">
-            <div class="col-md-2">&nbsp;</div>
-            <div class="col-md-3">
-                <!--<input type="button" value="Send Command" onclick="AJAXSubmit();" />
-                <br /><br /> -->
-                <input type="button" value="Stop Test UI RHS" onclick="NoIframe();" />
+            <div class="col-md-5">
+
             </div>
         </div>
+
         <hr />
  
     </div>
 
     @*New parent column to display robot simulator on the right on medium to large screens*@
-    <div id="robotContainer" class="col-md-6">
-        <label>Robot Client:</label><br />
+    <div class="col-md-6">
+        <div id="robotMessage"  style="display:none">
+        </div>
 
-        This video (1 min 46 sec) <br />
-        <a target="_blank" href="https://www.youtube.com/watch?v=dGFSwtsQrS8">https://www.youtube.com/watch?v=dGFSwtsQrS8</a> <br />
-        shows how the light patches work with light dependent resistors (LDRs)<br />
-        
-        <br />
-        The display below is a different webpage in an "iframe" to provide separation from the "commander".<br /><br />
-        <iframe id="robotIframe" src="/emulators/robotRat01.html" width="480" height="640"></iframe>
+        <div id="robotContainer">
+            Simulated Robot Client on this screen:<br />
+            <br />
+            The display below is a different webpage in an "iframe" to provide separation from the "Commander".<br />
+            <br />
+            Try this simulation first, then click the button to run with your own device or devices.<br />
+            <input type="button" value="Change to Device" onclick="NoIframe(true);" /><br /> 
+            <br />
+            <iframe id="robotIframe" name="robotIframe" src="~/emulators/Robot02.html" width="480" height="640"></iframe>
+        </div> 
     </div>
-
 </div>
 
 
@@ -99,10 +103,28 @@
 
     window.onload = function () {
         oeDriveStatus = document.getElementById("driveStatus");
+
+        //20170910 JPC config content in iframe from here in the parent.
+        //ref: https://www.w3schools.com/jsref/prop_frame_contentdocument.asp
+        //ref: https://developer.mozilla.org/en-US/docs/Web/API/GlobalEventHandlers/onload
+        document.getElementById("robotIframe").contentDocument.getElementById("CommanderId").value
+            = document.getElementById("CommanderId").value;
+
+        document.getElementById("robotMessage").innerHTML
+            = "The Robot Simulator iframe is now switched off.<br />"
+            + "You can test on a different device eg phone by navigating it to the root address of this same website: <br />"
+            + window.location.protocol + "//" + window.location.host + "/"
+            + "<br />then click on menu item 'Robot01'<br />"
+            + "You will need to type your 'CommanderId' value into the device.<br />"
+            + "Your 'CommanderId' is <b>" + document.getElementById("CommanderId").value + "</b>"
+            + "<br /><br />"
+            + "<input type='button' value='Back to Simulation' onclick='NoIframe(false);' /><br/><br />";
+
         window.onmousemove = function (e) {
             _wx = e.clientX;
             _wy = e.clientY;
-            Poll();        } 
+            Poll();
+        } 
     }
 
     function Poll() {
@@ -203,23 +225,20 @@
     }
 
 
-    function NoIframe() {
-        //remove the test javascript robot (html page) from this user interface
+    function NoIframe(isChange) {
+        //disable the test javascript robot (html page) from this user interface
+        //and prompt for the use of a device
         var oeRobotIframe = document.getElementById("robotIframe");
-
-        //20170805 JPC avoid repeating showing this message
-        if (_isNoIframe) return;
-        _isNoIframe = true;
-
-        oeRobotIframe.src = "#";
-        oeRobotIframe.style.display = "none";
-        var oeRobotContainer = document.getElementById("robotContainer");
-        oeRobotContainer.innerHTML
-            += "Javascript Robot Simulation is now removed from this User Interface.<br/>"
-            + "You can test on a different device by navigating to <br />"
-            + "https://remoterobot.manukautech.info/r.html"
-            + "<br />";
-        oeRobotContainer.style.backgroundColor = "lightgrey";
+        var oeRobotMessage = document.getElementById("robotMessage");
+        var oeContainer = document.getElementById("robotContainer");
+        if (isChange) {
+            oeRobotIframe.src = "#";
+            oeContainer.style.display = "none";
+            oeRobotMessage.style.display = "block";
+            oeRobotMessage.style.backgroundColor = "lightgrey";
+        } else {
+            window.location.replace(window.location.href);
+        }
     }
 
 </script>
