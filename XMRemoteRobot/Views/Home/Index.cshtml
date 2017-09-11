@@ -1,8 +1,16 @@
 ﻿@{
     ViewData["Title"] = "Home Page";
+    if (ViewData["Message"].ToString() == "")
+    {
+        <h2>XMRemoteRobot</h2>
+    }
+    else
+    {
+        <h2 style="color:red">@ViewData["Message"]</h2>
+    }
 }
 
-<h2>XMRemoteRobot</h2>
+
 <br />
 <div class="row" style="white-space: nowrap; overflow-x: scroll">
     <img src="~/images/IMG_3304.JPG" style="height:200px;" />
@@ -40,14 +48,15 @@
         </p>
         <p>
             "Test01" has buttons to send simple color change signals.<br />
-            "Test02" is the setup that we use to remote control our "creative rat" vehicle. Ref:<br />
-            <a target="_blank" href="https://www.youtube.com/watch?v=aVQCipqSoCs">https://www.youtube.com/watch?v=aVQCipqSoCs</a>
+            "Test02" is the setup that we use to remote control our "creative rat" vehicle. Videos:<br />
+            <a target="_blank" href="https://www.youtube.com/watch?v=aVQCipqSoCs">https://www.youtube.com/watch?v=aVQCipqSoCs</a> <br />
+            <a target="_blank" href="https://www.youtube.com/watch?v=dGFSwtsQrS8">https://www.youtube.com/watch?v=dGFSwtsQrS8</a> <br />
+            <br />
         </p>
         <p>
             "Robot01" is for testing "Test01" with client devices eg phones.<br />
             "Robot02" is for testing "Test02" with client devices eg phones.<br />
-            "Robot03" is standalone for testing the light patch effect on phones controlling servos. <br />
-            "Robot04" is standalone for testing the light patch effect on phones controlling simple DC motors.<br />
+            "Robot03" is standalone for testing the light patch effect on phones etc. <br />
         </p>
 
         <p>
