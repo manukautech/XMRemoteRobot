@@ -1,14 +1,11 @@
 # XMRemoteRobot
 A web service app which enables remote-control of near and distant devices via HTTP including over the public Internet.
 
-Live Demo - run this code at:
+Live Demo - test drive this app at:
 [https://r2.manukautech.info](https://r2.manukautech.info)
 
 Video:
 [https://www.youtube.com/watch?v=aVQCipqSoCs](https://www.youtube.com/watch?v=aVQCipqSoCs)
-
-Live Demo - run this code at:
-[https://r2.manukautech.info](https://r2.manukautech.info)
 
 This is a "long polling" app. "Commanders" and "Collectors" (robots, receivers) can rapidly poll this server for updated signal messages. We are getting signal message delivery times as fast as 0.2 sec. If Commanders are pausing or slow then the server delays "no new message" responses by 2 to 4 sec.
 
@@ -16,11 +13,6 @@ The technology is Microsoft ASP.NET Core 2.0 with a Microsoft SQL Server Express
 
 Run this on a Windows machine with Visual Studio 2017 installed. We use the "Community Edition" which is free of charge for education, individuals and small businesses. Download Core 2.0 SDK or Runtime from:
 [https://www.microsoft.com/net/download/core](https://www.microsoft.com/net/download/core)
-
-
-=======
-Run this on a Windows machine with Visual Studio 2017 installed. We use the "Community Edition" which is free of charge for education, individuals and small businesses.
-
 
 The code is setup to run the supplied database in folder "C:\Users\Public\LocalDB" which we find works quickly and easily on development machines owned by individuals. To run elsewhere, eg on a pen drive, on a webserver, you need to edit file "appSettings.json". While in "appSettings.json" you need to change the "appAccessKey" from the demo to something secure. You can run test pages on a local machine. You need to run as a website to demo devices as robot clients, or to operate robots for real.
 
