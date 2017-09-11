@@ -1,0 +1,95 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <!--
+      Project XMRemoteRobot - example of client-side processing for a robot vehicle
+      Copyright © 2017 John Calder as project leader
+      Licensed under the "Open Source" Apache License, Version 2.0.
+      See file LICENSE in the parent project root.
+      In brief, a generous license with some attribution rights reserved.
+      Questions? Contact John via the parent app contact+about page.
+    -->
+
+    <meta charset="utf-8" />
+    <title></title>
+    <script type="text/javascript">
+        var _timer;
+        var _xmlhttp;
+        //timeout method included to attempt conversation restart if connection lost
+        var _reset = 8000; 
+        var _messageId = -1; 
+        var _oeCommanderId;
+
+        //Called after application is started.
+        function OnStart() {
+            _oeCommanderId = document.getElementById("CommanderId");
+            Poll();
+        }
+
+        function Poll() {
+
+            _xmlhttp = new XMLHttpRequest();
+
+            //Note that with callback to a separate function, use function name only as in "XCallback" NOT "XCallback()"
+            _xmlhttp.onreadystatechange = XCallback;
+
+            var requestString = "/Home/XTest01/";
+            //alert("requestString = " + requestString);
+            var commanderId = _oeCommanderId.value;
+            var postString = "MessageId=" + _messageId + "&CategoryId=2&CommanderId=" + commanderId + "&RobotId=0&XData={\"status\": 300}&IsLog=true&AccessKey=mock-security-key-for-demo-only";
+
+            _xmlhttp.open("POST", requestString, true);
+            _xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+
+            //20170806 JPC this line stopped Google Chrome from working for me
+            //  left in here as an educational warning to others!
+            //_xmlhttp.responseType = 'json';
+
+            //20170723 JPC configure object _xmlhttp for removal before next polling
+            // not sure if this is needed but recommended at
+            // https://stackoverflow.com/questions/21789425/simple-xhr-long-polling-without-jquery
+
+            //JPC temp diagnosis
+            _xmlhttp.timeout = _reset;
+            _xmlhttp.ontimeout = Poll;
+            _xmlhttp.send(postString);
+        }
+
+        function XCallback() {
+            //check that object _xmlhttp is ready
+            if (_xmlhttp.readyState != 4 || _xmlhttp.status != 200) {
+                return;
+            }
+
+            var rawMessage = _xmlhttp.responseText;
+            document.getElementById("xMessage").value = rawMessage;
+
+            var oMessage = JSON.parse(rawMessage);
+            //20170804 JPC issues with crash on oMessage.command.color if it does not exist
+            if (rawMessage.indexOf('"color":') > -1) {
+                document.getElementById("robotColor").style.backgroundColor = oMessage.command.color;
+                _messageId = oMessage.messageid;
+            }
+            //successful callback gives prompt rerun
+            //JPC temp diagnosis comment-out next 1 line
+            window.setTimeout(Poll, 10);
+        }
+
+    </script>
+</head>
+
+<!-- variation from "DroidScript" where body onload="app.onStart();" -->
+<body onload="OnStart();">
+    <textarea id="xMessage" cols="42" rows="9"></textarea>
+    <br /><br />
+    <input type="text" style="width:4em" id="CommanderId" value="0" />
+    <span> --- CommanderId</span>
+    
+    <br /><br />
+    Change the colour of this robot:<br />
+    <div id="robotColor" style="width:300px; height: 50px; border: 2px solid black">
+        Robot Body
+    </div>
+
+</body>
+</html>
