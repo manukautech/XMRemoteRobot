@@ -20,5 +20,5 @@ Remote Control with signal messaging is a much discussed area and software does 
 
 In starting XMRemoteRobot I chose to make use of a database to store and manage signal messages in transit. Other apps go for in-memory management. In theory reading and writing to a database should carry a speed penalty but Microsoft SQL Server does extensive caching in memory so I thought we should try it. Early results indicate that when a signal message takes 0.20 seconds on its journey, 0.01 second of that is database read/write. That suggests a penalty of only 5 percent but it may be a little less than that because in-memory processing is not perfectly instant. The database advantages include: easier and clearer coding; ability to log conversations. Routing (sorting) signal messages is mostly done with SQL WHERE clauses eg getting a message intended for robot 1045 to its correct destination means running code like ".. WHERE RobotId = 1045".
 
-More details in this document: [https://github.com/manukautech/XMRemoteRobot/blob/master/Docu_XMRemoteRobot_v20170910.docx] (Docu_XMRemoteRobot_v20170910.docx). 
+More details in this document: https://github.com/manukautech/XMRemoteRobot/blob/master/Docu_XMRemoteRobot_v20170910.docx  
 
