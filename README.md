@@ -1,5 +1,5 @@
 # XMRemoteRobot Version 2.0
-A web service app which enables remote-control of near and distant devices via SignalR - a WebSockets framework - including over the public Internet.
+A web service app which enables remote-control of near and distant devices via SignalR - a WebSockets framework.
 
 Live Demo - test drive this app at:
 [https://xmrrae.azurewebsites.net](https://xmrrae.azurewebsites.net)
