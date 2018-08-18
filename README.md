@@ -1,4 +1,4 @@
-# XMRemoteRobot Version 2.0 - Note that this branch is currently under construction and incomplete
+# XMRemoteRobot Version 2.0 - Note that this branch is currently loading files and therefore incomplete
 A web service app which enables remote-control of near and distant devices via SignalR - a WebSockets framework - including over the public Internet.
 
 Live Demo - test drive this app at:
