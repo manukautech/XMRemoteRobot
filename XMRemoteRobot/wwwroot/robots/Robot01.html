@@ -1,0 +1,139 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <!--
+      Project XMRemoteRobot - example of client-side processing for a robot vehicle
+      Copyright © 2017 John Calder as project leader
+      Licensed under the "Open Source" Apache License, Version 2.0.
+      See file LICENSE in the parent project root.
+      In brief, a generous license with some attribution rights reserved.
+      Questions? Contact John via the parent app contact+about page.
+    -->
+
+    <meta charset="utf-8" />
+    <title></title>
+
+    <style>
+        * {
+            font-family: 'Courier New';
+            font-size: 0.4cm;
+        }
+    </style>
+
+    <script src="signalr.min.js"></script>
+
+    <script type="text/javascript" >
+        var _message;
+        //20180805 JPC get time taken for the signal journey
+        var _tStart = 0;
+        //20180805 DOM objects
+        var _oeCommanderId;    
+
+        const connection
+            = new signalR.HubConnectionBuilder().withUrl("/robothub").build();
+
+        //Called after application is started.
+        function onStart() {
+            _oeCommanderId = document.getElementById("CommanderId");
+            try {
+                connection.start();
+            } catch (err) {
+                alert("Error on first connection: " + err.message);
+            }
+        }
+
+        //receive from server
+        connection.on("XSignal", function(messageReceived){
+            _message = messageReceived;
+            receive();
+        });
+
+        function register() {
+            _tStart = 0;
+            document.getElementById("Info").value = "";
+            var oMessage = new Object();
+            oMessage.categoryid = 6;  //register a robot on the server
+            oMessage.commanderid = parseInt(_oeCommanderId.value);
+            oMessage.robotid = oMessage.commanderid + 100;
+            oMessage.accesskey = "demo-access-key";
+            _message = JSON.stringify(oMessage);
+            //alert(_message);
+            connection.invoke("XSignal", _message);
+        }
+
+        //send to server
+        function send() {
+            var oMessage = new Object();
+            oMessage.categoryid = 2;
+            oMessage.commanderid = _oeCommanderId.value;
+            oMessage.robotid = parseInt(oMessage.commanderid) + 100;
+            oMessage.accesskey = "demo-access-key";
+            var oXData = new Object();
+            oXData = JSON.parse(document.getElementById("XData").value);
+            oMessage.xdata = oXData;
+            _message = JSON.stringify(oMessage);
+            //alert(message);
+            connection.invoke("XSignal", _message);
+        }
+
+        function receive() {
+            //alert(_message);
+
+            var oMessage = JSON.parse(_message);
+
+            //Latency measurement - see more detailed comment below for function timeStart
+            if (_tStart > 0) {
+                var latency = Date.now() - _tStart;
+                document.getElementById("Info").value
+                    = "latency = " + latency + " milliseconds";
+            }
+
+            document.getElementById("XMessage").value = _message;
+
+            //20170804 JPC fix crash on oMessage.xdata.color if it does not exist
+            if ("color" in oMessage.xdata) {
+                document.getElementById("XMessage").style.backgroundColor = oMessage.xdata.color;
+            }
+
+            //20180718 JPC good to get confirmation back to the commander for demo purposes
+            if (oMessage.categoryid == 1) {
+                var d = new Date();
+                document.getElementById("XData").value
+                    = "{\"confirm\":\"received by Robot\",\"timestamp\":\"" + d + "\"}";
+                send();
+            }
+        }
+
+        //What is the latency? (the journey time)
+        //In test mode, parent page can write start time into this app in a child iframe.
+        //We are currently not attempting latency measurement with devices until we check
+        //how accurately they and the commander devices are set to universal time.
+        function timeStart(tStart) {
+            _tStart = tStart;
+        }
+
+    </script>
+
+</head>
+
+<!-- variation from "DroidScript" where body onload="app.onStart();" -->
+<body onload="onStart();">
+    <br />
+    <input type="text" style="width:4em" id="CommanderId" value="0" />
+    <span> -- CommanderId</span>&nbsp;&nbsp;
+    <button onclick="register();">Register</button>
+    <br /><br />
+    Sending:<br />
+    <input type="text" id="XData" style="width:22em" /><br />
+    <button onclick="send();">Send</button>
+
+    <br /><br />
+    Receiving:<br />
+    <textarea id="XMessage" rows="5" style="width:22em" readonly></textarea>
+    <br /><br />
+    Info:<br />
+    <input type="text" id="Info" style="width:22em" /><br />
+
+
+</body>
+</html>
