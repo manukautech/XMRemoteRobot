@@ -1,167 +1,283 @@
-
+@model XMRemoteRobot.Models.MotionDetectionGalleryModel
 @{
     ViewData["Title"] = "Test02";
 }
+<div class="container mt-3">
+    <div class="row">
+        <div class="col-md-6" id="xform">
+            <div id="uiLabel" style="font-weight:bold">Human Commander - mouse pointer in circle</div>
+            <button type="button" id="btn-controller-change" onclick="changeInput();">Change to gamepad</button>
+            <br /><br />
+            <div id="mousePad" style="width:320px;height:320px; margin:auto;
+            background-color:lightgreen; border-radius: 160px"></div>
 
-<div id="circle" style="position:absolute; top: 200px; left:50px; width:320px;height:320px; background-color:lightgreen; border-radius: 160px"></div>
+            <div id="gamepad-container" style="height:320px; text-align:center; padding-top:4em; display:none">
+                <img src="~/images/gamepad_1484179074_carlosmtnz.png" style="margin:auto" />
+            </div>
+            <br />
+            We only need to click "Register" if "CommanderId" stays blank<br />
+            <input type="text" id="CommanderId" value="" style="width:4em" readonly />
+            -- CommanderId&nbsp;
+            <button onclick="registerRequest();">Register</button>
+            <p>&nbsp;</p>
 
-<h2>Test02</h2>
+            <div class="text-center">
+                <h4 class="mb-3"> Robot Location</h4>
+                <div id="map" style="width:350px;height:350px;margin:auto"></div>
+            </div>
 
-@*20170722 JPC Nested layout*@
-<div class="row">
-    <div class="col-md-6" id="xform">
-        <label>Human Commander:</label>
-        <div style="height:410px">
-            Move the mouse pointer - or touch - inside the green circle.
-        </div>
-
-        <div class="row">
-            <div class="col-md-2"><label>Drive Status</label></div>
-            <div class="col-md-3"><div id="driveStatus" style="border:2px solid grey;width:300px;"></div> </div>
-        </div>
-        <div class="row">
-            <div class="col-md-2"><label>Confirm Server Action</label></div>
-            <div class="col-md-3"><div id="confirmSend" style="border:2px solid grey;width:300px;"></div> </div>
-        </div>
-        <hr />
-        <div class="row">
-            <div class="col-md-2"><label>MessageId</label></div>
-            <div class="col-md-3"><input type="text" id="MessageId" value="-1" readonly /></div>
-        </div>
-        <div class="row">
-            <div class="col-md-2"><label>CategoryId</label></div>
-            <div class="col-md-3"><input type="text" id="CategoryId" value="1" readonly /></div>
-        </div>
-        <!-- 20170909 JPC
-             CommanderId only is a simplification for demo purposes. 
-             The full protocol provides for separate CommanderId and RobotId.
-             With use of CommanderId only: RobotId is the same as CommanderId.
-        -->
-        <div class="row">
-            <div class="col-md-2"><label>CommanderId</label></div>
-            <div class="col-md-3">
-            <input type="text" id="CommanderId" value="@ViewData["CommanderId"]" readonly/></div>
-        </div>
-        <div class="row">
-            <div class="col-md-2"><label>XData</label></div>
-            <div class="col-md-3"><input type="text" id="XData" value='{"leftmotor": 80, "rightmotor": 100}' /> </div>
-        </div>
-        <div class="row">
-            <div class="col-md-2"><label>IsLog</label></div>
-            <div class="col-md-3"><input type="text" id="IsLog" value="false" /></div>
-        </div>
-        <div class="row">
-            <div class="col-md-2"><label>AccessKey</label></div>
-            <div class="col-md-3"><input type="text" id="AccessKey" value="mock-security-key-for-demo-only" /></div>
         </div>
 
-        <div class="row">
-            <div class="col-md-5">
 
+        @*New parent column to display robot simulator on the right on medium to large screens*@
+        <div class="col-md-6" style="padding-left:2em">
+            <div id="robotMessage" style="padding:2em;display:none">
+            </div>
+            <div id="robotContainer">
+                <p><b>Robot Client</b></p>
+                The display below is the robot software as a webpage in an "iframe" to provide separation from the "Commander".
+                <br />
+                <input type="button" value="Change to Device" onclick="noIframe(true);" /><br />
+                <br /><br />
+                <iframe id="robotIframe" name="robotIframe" src="~/robots/Robot02.html" style="width:25em;height:41em"></iframe>
             </div>
         </div>
-
-        <hr />
- 
     </div>
 
-    @*New parent column to display robot simulator on the right on medium to large screens*@
-    <div class="col-md-6">
-        <div id="robotMessage"  style="display:none">
-        </div>
+    @*Still image motion detection containers removed*@
+    <p>&nbsp;</p>
+    <div>Attribution: GamePad icon created by <a href="https://openclipart.org/user-detail/carlosmtnzt" title="carlosmtnz">carlosmtnz</a>. Retrieved from <a href="https://openclipart.org/detail/270512/gamepad" title="GamePad">openclipart.org</a></div>
 
-        <div id="robotContainer">
-            Simulated Robot Client on this screen:<br />
-            <br />
-            The display below is a different webpage in an "iframe" to provide separation from the "Commander".<br />
-            <br />
-            Try this simulation first, then click the button to run with your own device or devices.<br />
-            <input type="button" value="Change to Device" onclick="NoIframe(true);" /><br /> 
-            <br />
-            <iframe id="robotIframe" name="robotIframe" src="~/emulators/Robot02.html" width="480" height="640"></iframe>
-        </div> 
-    </div>
+    @*20170319 JPC get more flexible about deployment in website sub-folders defined as apps
+        by "dropping" the ~ operator into HTML in a way that JavaScript can get to it*@
+    <input id="rootDirectory" type="hidden" value="@Url.Content("~/")" />
 </div>
 
-
-@*20170319 JPC get more flexible about deployment in website sub-folders defined as apps
-    by "dropping" the ~ operator into HTML in a way that JavaScript can get to it*@
-<input id="rootDirectory" type="hidden" value="@Url.Content("~/")" />
-
+@*20180728 JPC convert from Ajax long polling to SignalR*@
+<script src="~/robots/signalr.min.js"></script>
 
 <script type="text/javascript">
+    var _oeCommanderId;
+    var _message = "";
+
+    //20180805 DOM objects 
+    var _oeCommanderId;
+    var _oeRobotIframe;
+    var _oeRobotMessage;
+    var _oeContainer;
+
+    //20180803 JPC new approach
+    var _accessKey = "demo-access-key";
+
+    const connection
+        = new signalR.HubConnectionBuilder().withUrl("/robothub").build();
+
     var oeCircle, oeDriveStatus;
-    var _timer;
-    var _xmlhttp;
-    var _isNoIframe = false;
-    var _isInProgress = false;
-    var _prevTime = Date.now();
-    var _prevwx = 0;
-    var _prevwy = 0;
+    var _gamepadTimer;
+
+    //mouse event tracking
     var _wx = 0;
     var _wy = 0;
+    var map, marker;
+    //20180805 JPC change default UI to mouse-circle
+    var _gamepadMode = false;
+    
+    //var _robotMode = 'None';
+    //var RobotMode = {
+    //    None: "None",
+    //    LiveStream: "LiveStream",
+    //    MotionDetect: "MotionDetect",
+    //    SpeechRecognition: "SpeechRecognition"
+    //}
 
     window.onload = function () {
-        oeDriveStatus = document.getElementById("driveStatus");
+        _oeCommanderId = document.getElementById("CommanderId");
+        _oeRobotIframe = document.getElementById("robotIframe");
+        _oeRobotMessage = document.getElementById("robotMessage");
+        _oeContainer = document.getElementById("robotContainer");
+        window.setTimeout(onloadDelay, 200);
+    }
+
+    function onloadDelay() {
+        try {
+            connection.start();
+            //give that 500ms then automatically run demo commander registration
+            window.setTimeout(registerRequest, 800);
+        } catch (err) {
+            alert("Error on first connection: " + err.message);
+        }
+    }
+
+    //receive from server
+    connection.on("XSignal", function (messageReceived) {
+        _message = messageReceived;
+        receive();
+    });
+
+    function receive() {
+        //alert(_message);
+
+        //document.getElementById("XMessage").value = _message;
+        ////blink effect
+        //document.getElementById("XMessage").style.backgroundColor = "rgb(255, 200, 200)";
+        //window.setTimeout(unblink, 200);
+        var oMessage = JSON.parse(_message);
+
+        //Case of success with registration
+        if (oMessage.categoryid == 4 && oMessage.commanderid > 0) {
+            registerProcess(oMessage)
+        } else if ("latitude" in oMessage.xdata) {
+            moveMarker(oMessage.xdata.latitude, oMessage.xdata.longitude);
+        }
+
+        //Message contains alert
+        if ("alert" in oMessage) {
+            alert(oMessage.alert);
+        }
+    }
+
+    //request server to allocate demo commanderid and setup communications
+    function registerRequest() {
+        var oMessage = new Object();
+        oMessage.categoryid = 4;  //register a demo commander on the server
+        oMessage.commanderid = 0;
+        oMessage.robotid = 0;
+        oMessage.accesskey = _accessKey;
+        _message = JSON.stringify(oMessage);
+        //alert(_message);
+        connection.invoke("XSignal", _message);
+    }
+
+    function registerProcess(oMessage) {
+        document.getElementById("CommanderId").value = oMessage.commanderid;
 
         //20170910 JPC config content in iframe from here in the parent.
         //ref: https://www.w3schools.com/jsref/prop_frame_contentdocument.asp
         //ref: https://developer.mozilla.org/en-US/docs/Web/API/GlobalEventHandlers/onload
-        document.getElementById("robotIframe").contentDocument.getElementById("CommanderId").value
-            = document.getElementById("CommanderId").value;
+        _oeRobotIframe.contentDocument.getElementById("CommanderId").value
+            = oMessage.commanderid;
+        //note use of contentWindow to access JavaScript functions in an iframe
+        _oeRobotIframe.contentWindow.register();
 
-        document.getElementById("robotMessage").innerHTML
-            = "The Robot Simulator iframe is now switched off.<br />"
-            + "You can test on a different device eg phone by navigating it to the root address of this same website: <br />"
-            + window.location.protocol + "//" + window.location.host + "/"
-            + "<br />then click on menu item 'Robot01'<br />"
-            + "You will need to type your 'CommanderId' value into the device.<br />"
-            + "Your 'CommanderId' is <b>" + document.getElementById("CommanderId").value + "</b>"
-            + "<br /><br />"
-            + "<input type='button' value='Back to Simulation' onclick='NoIframe(false);' /><br/><br />";
+        //document.getElementById("robotIframe").contentWindow._allowLocation = false;
+
+        _oeRobotMessage.innerHTML =
+            "You can test on a different device e.g. smartphone by visiting this same website:<br />"
+            + "<b>" + window.location.protocol + "//" + window.location.host + "/</b>"
+            + "<br />then click on menu item 'Robot02' <br />"
+            + "You will need to enter your 'CommanderId' value into the device.<br />"
+            + "Your 'CommanderId' is <b>" + oMessage.commanderid + "</b>"
+            + "<br /> <br />"
+            + "<input type='button' value='Back to Simulation' onclick='noIframe(false);' /><br/><br />";
 
         window.onmousemove = function (e) {
-            _wx = e.clientX;
-            _wy = e.clientY;
-            Poll();
-        } 
+            if (!_gamepadMode) {
+                _wx = e.clientX;
+                _wy = e.clientY;
+                send();
+            }
+        }
     }
 
-    function Poll() {
-        //Check for work in progress and no change in command
-        //with an exception for no action for 1.5 seconds (1500 milliseconds).
-        var timeSinceLastCall = Date.now() - _prevTime;
-        //oeDriveStatus.value = timeSinceLastCall;
-        if (_isInProgress && timeSinceLastCall < 1500) return;
-        if (_wx == _prevwx && _wy == _prevwy && timeSinceLastCall < 1500) return;
+    //send to server
+    function send() {
+        var oMessage = new Object();
+        oMessage.categoryid = 1; //commander sends to robot
+        oMessage.commanderid = parseInt(document.getElementById("CommanderId").value);
+        oMessage.robotid = oMessage.commanderid + 100;
+        oMessage.accesskey = _accessKey;
+        //oMessage.robotmode = _robotMode;
 
-        //set status tracking values
-        _prevwx = _wx;
-        _prevwy = _wy;
-        _isInProgress = true;
-
-        x = Math.round((_wx - 210) * 100 / 160);
-        y = Math.round((360 -_wy) * 100 / 160);
-        //check that we are in the circle
-        if (Math.sqrt(x * x + y * y) > 100) {
-            oeDriveStatus.innerHTML = "Out of range - RAW (" + _wx + ", " + _wy + ")";
-            x = 0;
-            y = 0;
+        //Monitor currently not used
+        //document.getElementById("XData").innerHTML = JSON.stringify(oXData);
+        if (_gamepadMode) {
+            oMessage.xdata = gamepadData()
+            if (oMessage.xdata.isvalid == 0) {
+                changeInput();
+                alert("GamePad is not responding or does not have an XBox-compatible output." 
+                + " If you have just started this page and you have a GamePad plugged in, it can work to wait 5 seconds, move the left joystick, then try again.");
+                return;
+            }
+        } else {
+            oMessage.xdata = mouseData();
         }
-        oeDriveStatus.innerHTML = "(" + x + ", " + y + ")";
+        _message = JSON.stringify(oMessage);
+        connection.invoke("XSignal", _message);
+    }
+
+    function mouseData() {
+        //20180710 JPC plain circle controller change '#canvas' to '#mousePad'
+        var leftMost = $("#mousePad").offset().left;
+        var rightMost = $("#mousePad").offset().left + $("#mousePad").outerWidth();
+        //20180710 JPC plain circle controller based on centre
+        var centreX = $("#mousePad").offset().left - window.scrollX + 160;
+        var centreY = $("#mousePad").offset().top - window.scrollY + 160;
+
+        x = Math.round(((_wx - centreX) / 160) * 100);
+        y = Math.round(((_wy - centreY) / 160) * 100) * -1;
+
+        var oXData;
+        //check that we are in the circle
+        var speed = Math.sqrt(x * x + y * y);
+        if (speed > 100) {
+            oXData = new Object();
+            oXData.vx1x1 = 0;
+            oXData.vx2x1 = 0;
+            oXData.vx1x2 = 0;
+            oXData.vx2x2 = 0
+        } else {
+            oXData = twinMotorCalc(x, y);
+        }
+        return oXData;
+    }
+
+    // 20171011 SA
+    function gamepadData() {
+        var oXData;
+        bFound = false;
+        if (!_gamepadMode) {
+            return;
+        }
+        var gamepads = navigator.getGamepads ? navigator.getGamepads() : (navigator.webkitGetGamepads ? navigator.webkitGetGamepads : []);
+
+        for (var i = 0; i < gamepads.length; i++) {
+            var gp = gamepads[i];
+            if (gp) {
+                if (gp.id == "Xbox 360 Controller (XInput STANDARD GAMEPAD)") {
+                    var x = gp.axes[0].toFixed(2) * 100;
+                    var y = gp.axes[1].toFixed(2) * -100;
+                    oXData = twinMotorCalc(x, y);
+                    oXData.isvalid = 1;
+                    bFound = true;
+                    break;
+                }
+            }
+        }
+        if (!bFound) {
+            //Not a valid gamepad
+            oXData = new Object();
+            oXData.isvalid = 0;
+        }
+        return oXData;
+    }
+
+    //Transform x and y input values to suitable values for driving a motor each side of the robot
+    //Turn commands need interpretation as side motors running at different speeds
+    function twinMotorCalc(x, y) {
+
         var leftDrive = y + x;
         if (leftDrive > 100) leftDrive = 100;
         var rightDrive = y - x;
         if (rightDrive > 100) rightDrive = 100;
-        var vx1x1, vx1x2, vx2x1, vx2x2;
 
+        //20180711 JPC fix to forward/reverse switching of leftDrive and rightDrive
         if (leftDrive >= 0) {
             vx1x1 = leftDrive;
             vx2x1 = 0;
         } else {
             vx1x1 = 0;
             vx2x1 = -leftDrive;
-        } 
+        }
 
         if (rightDrive >= 0) {
             vx1x2 = rightDrive;
@@ -169,77 +285,161 @@
         } else {
             vx1x2 = 0;
             vx2x2 = -rightDrive;
-        } 
-
-        var command = "{ \"vx1x1\":{0}, \"vx1x2\":{1}, \"vx2x1\":{2}, \"vx2x2\":{3}}";
-        command = command.replace("{0}", vx1x1);
-        command = command.replace("{1}", vx1x2);
-        command = command.replace("{2}", vx2x1);
-        command = command.replace("{3}", vx2x2);
-        document.getElementById("XData").value = command;
-
-        AjaxSubmit();
-    }
-    
-    //AJAX!  ref  http://www.w3schools.com/ajax/ajax_xmlhttprequest_create.asp
-    // Start by creating the xmlhttp object in Javascript to replace the older "form" methods
-    function AjaxSubmit() {
-        _xmlhttp = new XMLHttpRequest();
-        //Note that with callback to a separate function, use function name only as in "XCallback" NOT "XCallback()"
-        _xmlhttp.onreadystatechange = XCallback;
-
-        var requestString = document.getElementById("rootDirectory").value + "Home/XTest01/";
-        //alert("requestString = " + requestString);
-        var postString = "";
-        var inputs = document.getElementsByTagName("input");
-        for (i = 0; i < inputs.length; i++) {
-            //.getAttribute method from http://javascript-coder.com/javascript-form/getelementbyid-form.phtml
-            if (inputs[i].getAttribute('type') == "text") {
-                postString += inputs[i].id + "=" + inputs[i].value;
-                //AccessKey is the last input field of interest
-                if (inputs[i].id == "AccessKey") {
-                    break;
-                }
-                postString += "&";
-            }
         }
-        //alert("postString = " + postString);
-
-        _xmlhttp.open("POST", requestString, true);
-        _xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-        _xmlhttp.send(postString);
-        _prevTime = Date.now();
+        var oXData = new Object();
+        oXData.vx1x1 = vx1x1;
+        oXData.vx1x2 = vx1x2;
+        oXData.vx2x1 = vx2x1;
+        oXData.vx2x2 = vx2x2;
+        return oXData;
     }
 
-    function XCallback() {
-        //check that object _xmlhttp is ready
-        if (_xmlhttp.readyState != 4 || _xmlhttp.status != 200) {
-            return;
-        }
-        //display and/or check confirmation handshake then set timer for the next Poll
-        var rawMessage = _xmlhttp.responseText
-        document.getElementById("confirmSend").innerHTML = rawMessage;
-        //release lock on new polling
-        _isInProgress = false;
-        window.setTimeout(Poll, 200);
-    }
-
-
-    function NoIframe(isChange) {
+    function noIframe(isChange) {
         //disable the test javascript robot (html page) from this user interface
         //and prompt for the use of a device
-        var oeRobotIframe = document.getElementById("robotIframe");
-        var oeRobotMessage = document.getElementById("robotMessage");
-        var oeContainer = document.getElementById("robotContainer");
         if (isChange) {
-            oeRobotIframe.src = "#";
-            oeContainer.style.display = "none";
-            oeRobotMessage.style.display = "block";
-            oeRobotMessage.style.backgroundColor = "lightgrey";
+            _oeRobotIframe.src = "#";
+            _oeContainer.style.display = "none";
+            _oeRobotMessage.style.display = "block";
+            _oeRobotMessage.style.backgroundColor = "lightgrey";
         } else {
             window.location.replace(window.location.href);
         }
     }
 
+    //toggle between mouse input and gamepad
+    function changeInput() {
+        _gamepadMode = !_gamepadMode;
+
+        //20180710 JPC plain circle controller change '#circle' to '#mousePad'
+        if (_gamepadMode) {
+            $('#mousePad').hide();
+            $('#gamepad-container').show();
+            $("#btn-controller-change").html('Change to mouse');
+            $('#uiLabel').innerHTML = "Human Commander - gamepad";
+            _gamepadTimer = setInterval(send, 100);
+        } else {
+            clearInterval(_gamepadTimer);
+            $('#mousePad').show();
+            $('#gamepad-container').hide();
+            $("#btn-controller-change").html('Change to gamepad');
+            $('#uiLabel').innerHTML = "Human Commander - mouse pointer in circle";
+        }
+    }
+
 </script>
 
+<script>
+
+    function initMap() {
+        var styledMapType = new google.maps.StyledMapType(
+            [
+                {
+                    "featureType": "landscape.natural",
+                    "elementType": "geometry.fill",
+                    "stylers": [
+                        {
+                            "visibility": "on"
+                        },
+                        {
+                            "color": "#e0efef"
+                        }
+                    ]
+                },
+                {
+                    "featureType": "poi",
+                    "elementType": "geometry.fill",
+                    "stylers": [
+                        {
+                            "visibility": "on"
+                        },
+                        {
+                            "hue": "#1900ff"
+                        },
+                        {
+                            "color": "#c0e8e8"
+                        }
+                    ]
+                },
+                {
+                    "featureType": "road",
+                    "elementType": "geometry",
+                    "stylers": [
+                        {
+                            "lightness": 100
+                        },
+                        {
+                            "visibility": "simplified"
+                        }
+                    ]
+                },
+                {
+                    "featureType": "road",
+                    "elementType": "labels",
+                    "stylers": [
+                        {
+                            "visibility": "off"
+                        }
+                    ]
+                },
+                {
+                    "featureType": "transit.line",
+                    "elementType": "geometry",
+                    "stylers": [
+                        {
+                            "visibility": "on"
+                        },
+                        {
+                            "lightness": 700
+                        }
+                    ]
+                },
+                {
+                    "featureType": "water",
+                    "elementType": "all",
+                    "stylers": [
+                        {
+                            "color": "#7dcdcd"
+                        }
+                    ]
+                }
+            ],
+            { name: 'Styled Map' });
+
+
+        var myLatLng = { lat: -36.8485, lng: 174.7633 };
+
+        map = new google.maps.Map(document.getElementById('map'), {
+            zoom: 18,
+            center: myLatLng
+        });
+
+        //Associate the styled map with the MapTypeId and set it to display.
+        map.mapTypes.set('styled_map', styledMapType);
+        map.setMapTypeId('styled_map');
+
+        marker = new google.maps.Marker({
+            position: myLatLng,
+            map: map,
+            title: 'Hello World!'
+        });
+    }
+
+    function getPosition(position) {
+        x.innerHTML = "Latitude: " + position.coords.latitude +
+            "<br>Longitude: " + position.coords.longitude;
+    }
+
+
+    function moveMarker(lat, long) {
+
+        marker.setPosition(new google.maps.LatLng(lat, long));
+        map.panTo(new google.maps.LatLng(lat, long));
+    }
+</script>
+
+
+
+
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAUZ8vzVn2gPmQfihhhVsxSb3O5QPg2BJ4&callback=initMap">
+</script>
