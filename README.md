@@ -1,11 +1,12 @@
 # XMRemoteRobot Version 2.0
 A web service app which enables remote-control of near and distant devices via SignalR - a WebSockets framework.
 
-Live Demo - test drive this app at:
+Live Demo - test drive this app at:  
 [https://xmrrnz.manukautech.info](https://xmrrnz.manukautech.info) - Server located in Auckland, NZ  
 [https://xmrrae.azurewebsites.net](https://xmrrae.azurewebsites.net) - Server located in Azure "Australia East"  
 [https://xmrrwu.azurewebsites.net](https://xmrrwu.azurewebsites.net) - Server located in Azure "West US"   
-You can 
+You can see the latency effect at different distances.  
+For pages "Test01" and "Test02", commands travel from the left side of the page, to the server, then back to the robot code separated into an iframe on the right side of the page. Or to your smartphone-acting-as-robot when you navigate that to pages "Robot01" or "Robot02". Therefore multiply the distance to the server x 2 for the remote control distance.
 
 Video:
 [https://www.youtube.com/watch?v=aVQCipqSoCs](https://www.youtube.com/watch?v=aVQCipqSoCs)
