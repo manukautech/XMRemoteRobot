@@ -8,68 +8,72 @@
 
     @*20170722 JPC Nested layout*@
     <div class="row">
-        <div class="col-md-6" id="xform">
-            <label>Human Commander:</label>
-            <div class="row">
-                <div class="col-md-2"><label>MessageId</label></div>
-                <div class="col-md-3"><input type="text" id="MessageId" value="-1" readonly /></div>
-            </div>
-            <div class="row">
-                <div class="col-md-2"><label>CategoryId</label></div>
-                <div class="col-md-3"><input type="text" id="CategoryId" value="1" readonly/></div>
-            </div>
+        <div class="col-md-6" id="xform" style="border-right-style: solid;">
+            <label>Human Commander: Start with Yellow and Cyan buttons.</label>
+
             <!-- 20170909 JPC
-                 CommanderId only is a simplification for demo purposes.
-                 The full protocol provides for separate CommanderId and RobotId.
-                 With use of CommanderId only: RobotId is the same as CommanderId.
+                 The protocol provides for separate commanderid and robotid.
+                 To provide a demo we provide test commanderids in the range 10 to 19
+                 We then add on 100 for the robotId. Example pair is 10,110 (or 11,111 etc)
             -->
             <div class="row">
-                <div class="col-md-2"><label>CommanderId</label></div>
-                <div class="col-md-3">
-                    <input type="text" id="CommanderId" value="@ViewData["CommanderId"]" readonly/>
-                    <input type="hidden" id="RobotId" value="0" />
+                <div class="col-md-11">
+                    <input type="text" id="AccessKey" value="demo-access-key" />
+                    <br />&nbsp;
                 </div>
             </div>
+
             <div class="row">
-                <div class="col-md-2"><label>XData</label></div>
-                <div class="col-md-3"><input type="text" id="XData" value='{"leftmotor": 80, "rightmotor": 100}' /> </div>
+                <div class="col-md-11">
+                    We only need to click "Register" if "CommanderId" stays blank<br />
+                    <input type="text" id="CommanderId" value="" style="width:4em" readonly />
+                    -- CommanderId&nbsp;
+                    <button onclick="registerRequest();">Register</button>
+                    @*<input type="hidden" id="RobotId" value="0" />*@
+                </div>
             </div>
+            <br />
             <div class="row">
-                <div class="col-md-2"><label>IsLog</label></div>
-                <div class="col-md-3"><input type="text" id="IsLog" value="false" /></div>
+                <div class="col-md-11">
+                    Sending:<br />
+                    <input type="text" id="XData" 
+                      style="width:90%;font-family:'Courier New';font-size:0.4cm;" 
+                      value='{"leftmotor": 80, "rightmotor": 100}' />
+                    <br />&nbsp;
+                </div>
             </div>
+
             <div class="row">
-                <div class="col-md-2"><label>AccessKey</label></div>
-                <div class="col-md-3"><input type="text" id="AccessKey" value="mock-security-key-for-demo-only" /></div>
-            </div>
-            <div class="row">
-                <div class="col-md-2">&nbsp;</div>
-                <div class="col-md-3">
-                    <input type="button" value="Send Command" onclick="AJAXSubmit();" />
+                <div class="col-md-11">
+                    <input type="button" value="Send" onclick="send();" />
                     <br /><br />
-                    <input type="button" value="Send Yellow Command" onclick="XColor('yellow');" /><br />
-                    <input type="button" value="Send Cyan Command" onclick="XColor('cyan');" />
+                    <input type="button" value="Yellow Command" onclick="xColor('yellow');" />
+                    &nbsp;<input type="button" value="Cyan Command" onclick="xColor('cyan');" />
                     <br />
                 </div>
             </div>
             <hr />
             <div class="row">
-                <div class="col-md-2"><label>Confirm Server Action</label></div>
-                <div class="col-md-3"><input type="text" id="confirmSend" readonly /></div>
+                <div class="col-md-11">
+                    Receiving:<br />
+                    <textarea id="XMessage" rows="6" 
+                      style="width:90%;font-family:'Courier New';font-size:0.4cm;" readonly>
+                    </textarea>
+                </div>
             </div>
-            <div id=""></div>
+            <hr />
+            <p>&nbsp;</p>
         </div>
-        <div id="robotMessage" class="col-md-6" style="display:none">          
+        
+        <div id="robotMessage" class="col-md-6" style="padding:2em;display:none">
         </div>
         <div id="robotContainer" class="col-md-6">
-            Simulated Robot Client on this screen:<br />
+            <label>Robot Client:</label><br />
+            The display below is the robot software as a webpage in an "iframe" to provide separation from the "Commander".
             <br />
-            The display below is a different webpage in an "iframe" to provide separation from the "Commander".<br />
-            <br />
-            Try this simulation first, then click the button to run with your own device or devices.<br />
-            <input type="button" value="Change to Device" onclick="NoIframe(true);" /><br />
+            <input type="button" value="Change to Device" onclick="noIframe(true);" /><br />
             <br /><br />
-            <iframe id="robotIframe" name="robotIframe" src="~/emulators/Robot01.html" width="500" height="600"></iframe>
+            <iframe id="robotIframe" name="robotIframe" src="~/robots/Robot01.html" style="width:25em;height:35em"></iframe>
         </div>
 
     </div>
@@ -80,76 +84,141 @@
     by "dropping" the ~ operator into HTML in a way that JavaScript can make use of it*@
 <input id="rootDirectory" type="hidden" value="@Url.Content("~/")" />
 
+<script src="~/robots/signalr.min.js"></script>
+
 <script type="text/javascript">
+    var _message = "";
+
+    //20180805 DOM objects 
+    var _oeCommanderId;
+    var _oeRobotIframe;
+    var _oeRobotMessage;
+    var _oeContainer;
+
+    const connection
+        = new signalR.HubConnectionBuilder().withUrl("/robothub").build();
+
     window.onload = function () {
+        _oeCommanderId = document.getElementById("CommanderId");
+        _oeRobotIframe = document.getElementById("robotIframe");
+        _oeRobotMessage = document.getElementById("robotMessage");
+        _oeContainer = document.getElementById("robotContainer");
+        window.setTimeout(onloadDelay, 200);
+    }
+
+    function onloadDelay() {
+        try {
+            connection.start();
+            //give that 500ms then automatically run demo commander registration
+            window.setTimeout(registerRequest, 800);
+        } catch (err) {
+            alert("Error on first connection: " + err.message);
+        }
+    }
+
+    //receive from server
+    connection.on("XSignal", function (messageReceived) {
+        _message = messageReceived;
+        receive();
+    });
+
+    //send to server
+    function send() {
+        _message = "testing function send()"
+        var oMessage = new Object();
+        oMessage.categoryid = 1; //commander sends to robot
+        oMessage.commanderid = parseInt(_oeCommanderId.value);
+        oMessage.robotid = oMessage.commanderid + 100;
+        oMessage.accesskey = document.getElementById("AccessKey").value;
+        var oXData = new Object();
+        oXData = JSON.parse(document.getElementById("XData").value);
+        oMessage.xdata = oXData;
+        _message = JSON.stringify(oMessage);
+        //alert(_message);
+        //20180805 JPC if we are in test mode, then write start time into the receiving test page
+        if (_oeRobotIframe.style.display !== "none") {
+            tStart = Date.now();
+            _oeRobotIframe.contentWindow.timeStart(tStart);
+        }
+        connection.invoke("XSignal", _message);
+    }
+
+    //request server to allocate demo commanderid and setup communications
+    function registerRequest() {
+        var oMessage = new Object();
+        oMessage.categoryid = 4;  //register a demo commander on the server
+        oMessage.commanderid = 0;
+        oMessage.robotid = 0;
+        oMessage.accesskey = "demo-access-key";
+        _message = JSON.stringify(oMessage);
+        //alert(_message);
+        connection.invoke("XSignal", _message);
+    }
+
+    function receive() {
+        //alert(message);
+
+        document.getElementById("XMessage").value = _message;
+        //blink effect
+        document.getElementById("XMessage").style.backgroundColor = "rgb(255, 200, 200)";
+        window.setTimeout(unblink, 200);
+        var oMessage = JSON.parse(_message);
+
+        //Case of success with registration
+        if (oMessage.categoryid == 4 && oMessage.commanderid > 0) {
+            registerProcess(oMessage)
+        }
+
+        //Message contains alert
+        if ("alert" in oMessage) {
+            alert(oMessage.alert);
+        }
+    }
+
+    function unblink() {
+        document.getElementById("XMessage").style.backgroundColor = "rgb(255, 255, 255)";
+    }
+
+    function xColor(robotColor) {
+        var oeData = document.getElementById("XData");
+        //write the color command into the XData field
+        oeData.value = '{"color":' + '"' + robotColor + '"}';
+        //send new data to the server
+        send();
+    }
+
+    function registerProcess(oMessage) {
+        _oeCommanderId.value = oMessage.commanderid;
+
+        //alert("Received oMessage.commanderid = " & oMessage.commanderid);
+
         //20170910 JPC config content in iframe from here in the parent.
         //ref: https://www.w3schools.com/jsref/prop_frame_contentdocument.asp
         //ref: https://developer.mozilla.org/en-US/docs/Web/API/GlobalEventHandlers/onload
-        document.getElementById("robotIframe").contentDocument.getElementById("CommanderId").value
-            = document.getElementById("CommanderId").value;
+        _oeRobotIframe.contentDocument.getElementById("CommanderId").value
+            = oMessage.commanderid;
+        //note use of contentWindow to access JavaScript functions in an iframe
+        _oeRobotIframe.contentWindow.register();
 
-        document.getElementById("robotMessage").innerHTML
+        _oeRobotMessage.innerHTML
             = "The Robot Simulator iframe is now switched off.<br />"
-            + "You can test on a different device eg phone by navigating it to the root address of this same website: <br />"
-            + window.location.protocol + "//" + window.location.host + "/"
+        + "You can test on a different device e.g. smartphone by visiting this same website:<br />"
+            + "<b>" + window.location.protocol + "//" + window.location.host + "/</b>"
             + "<br />then click on menu item 'Robot01'.<br />"
             + "You will need to type your 'CommanderId' value into the device.<br />"
-            + "Your 'CommanderId' is <b>" + document.getElementById("CommanderId").value + "</b>"
+            + "Your 'CommanderId' is <b>" + oMessage.commanderid + "</b>"
             + "<br /><br />"
-            + "<input type='button' value='Back to Simulation' onclick='NoIframe(false);' /><br/><br />";
+            + "<input type='button' value='Back to Simulation' onclick='noIframe(false);' /><br/><br />";
     }
 
-    //AJAX  ref  http://www.w3schools.com/ajax/ajax_xmlhttprequest_create.asp
-    // Start by creating the xmlhttp object in Javascript to replace the older "form" methods
-    function AJAXSubmit() {
-        var xmlhttp;
-        xmlhttp = new XMLHttpRequest();
-        xmlhttp.onreadystatechange = function () {
-            if (this.readyState == 4 && this.status == 200) {
-                document.getElementById("confirmSend").value = this.responseText;
-            }
-        };
-        var requestString = document.getElementById("rootDirectory").value + "Home/XTest01/";
-        //alert("requestString = " + requestString);
-        var postString = "";
-        var inputs = document.getElementsByTagName("input");
-        for (i = 0; i < inputs.length; i++) {
-            //.getAttribute method from http://javascript-coder.com/javascript-form/getelementbyid-form.phtml
-            if (inputs[i].getAttribute('type') == "text" || inputs[i].getAttribute('type') == "hidden") {
-                postString += inputs[i].id + "=" + inputs[i].value;
-                //AccessKey is the last input field of interest
-                if (inputs[i].id == "AccessKey") {
-                    break;
-                }
-                postString += "&";
-            }
-        }
-        //alert("postString = " + postString);
-
-        xmlhttp.open("POST", requestString, true);
-        xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-        xmlhttp.send(postString);
-    }
-
-    function XColor(robotColor) {
-        var oeData = document.getElementById("XData");
-        //write the color command into the XData field
-        oeData.value = '{"color": ' + '"' + robotColor + '"}';
-        //send new data to the server
-        AJAXSubmit();
-    }
-
-    function NoIframe(isChange) {
+    function noIframe(isChange) {
         //disable the test javascript robot (html page) from this user interface
         //and prompt for the use of a device
-        var oeRobotIframe = document.getElementById("robotIframe");
-        var oeRobotMessage = document.getElementById("robotMessage");
-        var oeContainer = document.getElementById("robotContainer");
         if (isChange) {
-            oeRobotIframe.src = "#";
-            oeContainer.style.display = "none";
-            oeRobotMessage.style.display = "block";
-            oeRobotMessage.style.backgroundColor = "lightgrey";
+            _oeRobotIframe.src = "#";
+            _oeContainer.style.display = "none";
+            _oeRobotMessage.style.display = "block";
+            _oeRobotMessage.style.backgroundColor = "lightgrey";
         } else {
             window.location.replace(window.location.href);
         }

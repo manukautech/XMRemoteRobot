@@ -1,85 +1,188 @@
 ﻿@{
     ViewData["Title"] = "Home Page";
-    if (ViewData["Message"].ToString() == "")
-    {
-        <h2>XMRemoteRobot</h2>
-    }
-    else
-    {
-        <h2 style="color:red">@ViewData["Message"]</h2>
-    }
+
 }
 
+@*20180804 JPC longer slide change interval with data-interval-"9000"
+    ref: https://iiiji.com/bootstrap-carousel-slider-transition-speed-time-interval/
+    ref: https://getbootstrap.com/docs/4.0/components/carousel/
+*@
+<div id="carouselXMRR" class="carousel slide p-0" data-ride="carousel" data-interval="9000">
+    <div class="carousel-inner">
+        <div class="carousel-item active">
+            <div class="row">
+                <div class="col col-sm-6">
+                    <img class="d-block w-100" src="~/images/crat (5).JPG" alt="CRAT">
+                </div>
+                <div class=" col col-sm-6">
+                    <img class="d-block w-100" src="~/images/crat (2).JPG" alt="CRAT">
+                </div>
+            </div>
+        </div>
 
-<br />
-<div class="row" style="white-space: nowrap; overflow-x: scroll">
-    <img src="~/images/IMG_3304.JPG" style="height:200px;" />
-    <img src="~/images/IMG_3307.JPG" style="height:200px;" />
-    <img src="~/images/Test02Circle.jpg" style="height:200px;" />
-    <img src="~/images/Test02Moni.jpg" style="height:200px;" />
-    <img src="~/images/Test02Patches.jpg" style="height:200px;" />
-    <img src="~/images/IMG_3309.JPG" style="height:200px;" />
-    <img src="~/images/IMG_1154.JPG" style="height:200px;" />
+        <div class="carousel-item">
+            <div class="row">
+                <div class="col-md-12">
+                    <img class="d-block w-100" src="~/images/old-photos.jpg" alt="CRAT">
+                </div>
+            </div>
+        </div>
+
+
+        <div class="carousel-item">
+            <div class="row">
+                <div class="col col-sm-6">
+                    <img class="d-block w-100" src="~/images/crat (3).JPG" alt="CRAT">
+                </div>
+
+                <div class="col col-sm-6">
+                    <img class="d-block w-100" src="~/images/crat (4).JPG" alt="CRAT">
+                </div>
+
+            </div>
+
+        </div>
+        <div class="carousel-item">
+            <div class="row">
+                <div class="col col-sm-6">
+                    <img class="d-block w-100" src="~/images/crat (1).JPG" alt="CRAT">
+                </div>
+
+                <div class="col col-sm-6">
+                    <img class="d-block w-100" src="~/images/crat (6).JPG" alt="CRAT">
+                </div>
+
+            </div>
+
+        </div>
+        <div class="carousel-item">
+            <div class="row">
+                <div class="col col-sm-6">
+                    <img class="d-block w-100" src="~/images/crat (7).JPG" alt="CRAT">
+                </div>
+
+                <div class="col col-sm-6">
+                    <img class="d-block w-100" src="~/images/crat (8).JPG" alt="CRAT">
+                </div>
+
+            </div>
+
+        </div>
+        <div class="carousel-item">
+            <div class="row">
+                <div class="col col-sm-6">
+                    <img class="d-block w-100" src="~/images/crat (9).JPG" alt="CRAT">
+                </div>
+
+                <div class="col col-sm-6">
+                    <img class="d-block w-100" src="~/images/crat (10).JPG" alt="CRAT">
+                </div>
+
+            </div>
+
+        </div>
+        <div class="carousel-item">
+            <div class="row">
+                <div class="col col-sm-6">
+                    <img class="d-block w-100" src="~/images/crat (11).JPG" alt="CRAT">
+                </div>
+
+                <div class="col col-sm-6">
+                    <img class="d-block w-100" src="~/images/crat (12).JPG" alt="CRAT">
+                </div>
+
+            </div>
+
+        </div>
+
+        <a class="carousel-control-prev" href="#carouselXMRR" role="button" data-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="sr-only">Previous</span>
+        </a>
+        <a class="carousel-control-next" href="#carouselXMRR" role="button" data-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="sr-only">Next</span>
+        </a>
+    </div>
 </div>
 <br />
-<div class="row" style="font-family: Verdana; font-size:0.4cm; color: black">
-    <div class="col-md-6">
-        <p>
-            A project where we use mobile phones as robot processor "brains".<br />
-            <br />
-            This app is the messaging server which currently enables remote-control via HTTP.
-            That means we can control a wide range of distant devices over the public Internet as well the more common local area control.
-            <br /><br />
-            We use this for operating our robots over the Internet.
-        </p>
 
-        <p>
-            Many of the devices we run, eg laptops and phones, cannot talk to each other directly over
-            the public Internet. Our "Commanders" and "Collectors"(Receivers) need to connect as clients to this server system
-            which receives and passes on their messages.
-        </p>
-
+<div class="container" style="font-family: Verdana; font-size:0.4cm; color: black">
+    <h2 class="text-center mb-5">XMRemoteRobot</h2>
+    <div class="row">
+        <div class="col-md-6">
+            <b>Introduction</b>
+            <p>
+                A project where we use smartphones and smartwatches as robot processor "brains".<br />
+                <br />
+                This app is the messaging server which currently enables remote-control via "SignalR".
+                That means we can control a wide range of distant devices over the public Internet.
+                <br /><br />
+            </p>
+            <p>
+                For demos and quick testing our signals cause light patches on the device screen to change brightness.
+                This gets detected by LDR sensors which feed into motor and servo control circuits.<br />
+                For more precise control the device passes commands to microprocessors via bluetooth.
+            </p>
+        </div>
+        <div class="col-md-6">
+            <b>What's in the menu?</b>
+            <p>"Test01" and "Test02" are the test pages for larger screen devices, tablet or bigger.<br />
+            "Robot01" and "Robot02" are the corresponding optional-extra pages for smartphones or other android devices acting as robot brains.
+            </p>
+            <p>
+                In <a href="~/home/test01">"Test01"</a> we get to click buttons on the left of the page
+                and a rectangle on the right changes color.
+                If nothing is happening try clicking the left "Register" button.
+                The big deal here is that the command travels to a SignalR server and back which could be a journey of thousands of kilometres.
+                We can check the journey time. <br /><br />
+                We can then click on "Change to Device" to make the right hand view disappear, then open this website with
+                a smartphone, or other device, and click on "Robot01" in the menu. The screen left
+                hand side gives us a "CommanderId" number which we need to enter into the smartphone to get a
+                pairing happening.
+            </p>
+            <p>
+                <a href="~/home/test02">"Test02"</a> is our remote control for the drive motors of "Roxie the Robot".
+                We can use a smartphone to open this website and click on "Robot02".<br />
+                On the left is a green circle where we move the mouse to control "Roxie".
+                We can also click "Change to GamePad" if we have a USB game controller available.
+            </p>
+        </div>
     </div>
+    <p>&nbsp;</p>
+    <div class="row">
+        <div class="col-md-6">
+            <b>Videos</b><br />
+            <p>
+                The "light patch" interface enables any device with a browser to act as a robot brain by opening a web page.<br />
+                <a href="https://www.youtube.com/watch?v=K4PWizgi_Ck" target="_blank">
+                    https://www.youtube.com/watch?v=K4PWizgi_Ck
+                </a>
+            </p>
+            <p>
+                Robot Remote Control Achieved<br />
+                <a target="_blank" href="https://www.youtube.com/watch?v=aVQCipqSoCs">https://www.youtube.com/watch?v=aVQCipqSoCs</a>
+            </p>
+            <p>
+                Evolution of a Snake Robot<br />
+                <a target="_blank" href="https://www.youtube.com/watch?v=1kkDN4BqMLU">https://www.youtube.com/watch?v=1kkDN4BqMLU</a>
+            </p>
+            <p>
+                Snake Robot moves with "inchworm" gait<br />
+                <a target="_blank" href="https://www.youtube.com/watch?v=fH-PG9sievw">https://www.youtube.com/watch?v=fH-PG9sievw</a>
+            </p>
+        </div>
 
-    <div class="col-md-6">
-        <p>
-            Pages "Test01" and "Test02", in the above menu, consist of 2 independent pages side by side
-            to give a simulation of "commander"(left) and "collector/receiver"(right).
-        </p>
-        <p>
-            "Test01" has buttons to send simple color change signals.<br />
-            "Test02" is the setup that we use to remote control our "creative rat" vehicle. Videos:<br />
-            <a target="_blank" href="https://www.youtube.com/watch?v=aVQCipqSoCs">https://www.youtube.com/watch?v=aVQCipqSoCs</a> <br />
-            <a target="_blank" href="https://www.youtube.com/watch?v=dGFSwtsQrS8">https://www.youtube.com/watch?v=dGFSwtsQrS8</a> <br />
-            <br />
-        </p>
-        <p>
-            "Robot01" is for testing "Test01" with client devices eg phones.<br />
-            "Robot02" is for testing "Test02" with client devices eg phones.<br />
-            "Robot03" is standalone for testing the light patch effect on phones etc. <br />
-        </p>
+        <div class="col-md-6">
+            <p>
+                <b>Blog</b><br />
+                HiTechFromLoTech is about looking for the hidden talents in ordinary and accessible
+                technologies then putting them together in new and interesting ways
+                for maker interest, education, and even research and invention.<br />
+                <a target="_blank" href="https://hitechfromlotech.blogspot.com">https://hitechfromlotech.blogspot.com</a>
+            </p>
+            <p>
 
-        <p>
-            For the techies: This is a "long polling" app. <br />
-            The fastest send and receive rates are 0.2 to 0.5 sec. If Commanders are pausing or slow then
-            the server delays "no new message" responses by 2 to 4 sec.
-        </p>
+            </p>
+        </div>
     </div>
-</div>
-<div class="row" style="font-family: Verdana; font-size:0.4cm; color: black">
-    <div class="col-md-6">
-        <p>
-            The blog:<br />
-            <a href="https://hitechfromlotech.blogspot.com">https://hitechfromlotech.blogspot.com</a>
-        </p>
-
-        <p>
-            The videos:<br />
-            <a href="https://www.youtube.com/iafilm">https://www.youtube.com/iafilm</a>
-        </p>
-    </div>
-    <div class="col-md-6">
-        &nbsp;
-    </div>
-</div>
-
