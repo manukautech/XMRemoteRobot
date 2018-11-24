@@ -2,7 +2,6 @@
 A web service app which enables remote-control of near and distant devices via SignalR - a WebSockets framework.
 
 Live Demo - test drive this app at:  
-[https://xmrrnz.manukautech.info](https://xmrrnz.manukautech.info) - Server located in Auckland, NZ  
 [https://xmrrae.azurewebsites.net](https://xmrrae.azurewebsites.net) - Server located in Azure "Australia East"  
 [https://xmrrwu.azurewebsites.net](https://xmrrwu.azurewebsites.net) - Server located in Azure "West US"   
 You can see the latency effect at different distances.  
