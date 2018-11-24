@@ -28,10 +28,14 @@ namespace XMRemoteRobot
 
             services.AddSignalR();
 
+            //20181124 JPC Ver2.1 Enable CORS = Cross Origin Resource Sharing
+            // https://docs.microsoft.com/en-us/aspnet/core/security/cors?view=aspnetcore-2.1
+            services.AddCors();
+
         }
 
-		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-		public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
 		{
 
 			if (env.IsDevelopment())
@@ -46,7 +50,17 @@ namespace XMRemoteRobot
 
 			app.UseStaticFiles();
 
-			app.UseMvc(routes =>
+            //CORS - see above reference - need to allow any origin to make app clients possible
+            //also: https://docs.microsoft.com/en-us/aspnet/core/signalr/security?view=aspnetcore-2.1
+            app.UseCors(builder =>
+            { 
+                builder.AllowAnyOrigin()
+                .AllowAnyHeader()
+                .WithMethods("GET", "POST")
+                .AllowCredentials();
+            });
+
+            app.UseMvc(routes =>
 			{
 				routes.MapRoute(
 					name: "default",
