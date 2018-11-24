@@ -20,7 +20,7 @@ More details in this document: https://github.com/manukautech/XMRemoteRobot/blob
 
 Example of a teaching resource spinoff: https://github.com/manukautech/XMRemoteRobot/blob/master/Lessons%20from%20Robots%20about%20JSON_v20180818.docx
  
-Recent version changes:
+Recent version changes:  
 2.1   - Enable app clients by adding CORS permissions for them  
       - Update asp.net core runtime from 2.1.2 to 2.1.5  
 2.0   - Extensive rewrite moving from HTTP to SignalR-Websockets. Replace database with an in-memory object. 
