@@ -33,11 +33,14 @@ namespace XMRemoteRobot
 
         /*
          * 
-        Example registration - commander device gets started with
-        {"categoryid":0,"commanderid":13,"robotid":0}
-        
-        Example registration - robot device gets started with
-        {"categoryid":0,"commanderid":13,"robotid":113}  
+        Example registration DEMO mode - commander device gets started with "categoryid":4 which triggers automatic channel allocation
+        {"categoryid":4,"commanderid":0,"robotid":0,"accesskey":"demo-access-key"}
+ 
+        Example registration - commander device gets started with "categoryid":5 
+        {"categoryid":5,"commanderid":1,"robotid":101,"accesskey":"demo-access-key"}
+
+        Example registration - robot device gets started with "categoryid":6
+        {"categoryid":6,"commanderid":13,"robotid":113,"accesskey":"demo-access-key"}  
             
         Example Command
         {"categoryid":1,"commanderid":13,"robotid":113,"accesskey":"metropolis592"
@@ -68,6 +71,7 @@ namespace XMRemoteRobot
             switch (categoryId)
             {
                 case 1:
+                    //Commander sending command to Robot
                     recipientId = robotId;
                     break;
                 case 2:
