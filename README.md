@@ -2,6 +2,7 @@
 A web service app which enables remote-control of near and distant devices via SignalR - a WebSockets framework.
 
 Live Demo - test drive this app at:  
+[https://xmrrnz.manukautech.info](https://xmrrnz.manukautech.info) - Server located in Auckland, New Zealand    
 [https://xmrrae.azurewebsites.net](https://xmrrae.azurewebsites.net) - Server located in Azure "Australia East"  
 [https://xmrrwu.azurewebsites.net](https://xmrrwu.azurewebsites.net) - Server located in Azure "West US"   
 You can see the latency effect at different distances.  
@@ -9,8 +10,9 @@ For pages "Test01" and "Test02", commands travel from the left side of the page,
 
 From version 2.0 we have moved from HTTP to Websockets-SignalR. This is delivering a big improvement in latency - as in delay in remote control and monitoring. Example latency results are 10ms on local area networks, and 70ms over a distance of 4000km. With version 02 we route between commanders and robots with an in-memory "dictionary" object. We have removed the database in this version. That also removes logging and some potential future elements. Not having a database does however make setup and hosting easier. XMRemoteRobot hosts well on the free and low cost Azure shared hosting websites.
 
-Run this on a Windows machine with Visual Studio 2017 installed. We use the "Community Edition" which is free of charge for education, individuals and small businesses. Also download Core 2.1 SDK from:
-[https://www.microsoft.com/net/download/core](https://www.microsoft.com/net/download/core)
+Run XMRemoteRobot on a Windows machine with Visual Studio 2017 installed. We use the "Community Edition" which is free of charge for education, individuals and small businesses. Also download and install ".NET Core 2.2 SDK" from:
+[https://www.microsoft.com/net/download/core](https://www.microsoft.com/net/download/core)  
+If you are running the full IIS Webserver on your test machine, you will also need to download and install ".NET Core 2.2 Runtime".  
 
 Edit "appSettings.json" to change the "appAccessKey" from the demo to something secure. You can run test pages on a local machine. You need to deploy on the full webserver "IIS" rather than the test webserver "IISExpress" to run devices as robot clients, or to operate robots.
 
