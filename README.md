@@ -18,7 +18,12 @@ Remote Control with signal messaging is a much discussed area and software does 
 
 More details in this document: https://github.com/manukautech/XMRemoteRobot/blob/master/Docu_XMRemoteRobot_v20180818.docx  
 
-Example of a teaching resource spinoff: https://github.com/manukautech/XMRemoteRobot/blob/master/Lessons%20from%20Robots%20about%20JSON_v20180818.docx
+Example of a teaching resource spinoff: https://github.com/manukautech/XMRemoteRobot/blob/master/Lessons%20from%20Robots%20about%20JSON_v20180818.docx  
+  
+Related publication:  
+Afrin, S., Calder, J. (2018) *A Prototype Robot as an Example of Creative Repurposing of Accessible Technologies.* \[Conference paper presented at ITX/CITRENZ, Wellington, NZ \] Retrieved from:  
+https://www.citrenz.ac.nz/conferences/2018/pdf/2018CITRENZ_1_Afrin_Robot.pdf
+
  
 Recent version changes:  
 2.1  - Enable app clients by adding CORS permissions for them  
