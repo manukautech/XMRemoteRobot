@@ -1,5 +1,7 @@
-# XMRemoteRobot Version 2.1
+# XMRemoteRobot Version 2.2
 A web service app which enables remote-control of near and distant devices via SignalR - a WebSockets framework.
+
+Big step up for Version 2.2 of 24 Mar 2019 - live video, see what the robot sees, achieved by capturing images from the robot camera at a current nominal 6 frames per second, and sending them over the same SignalR signals as remote control. This means this one app does it all. Remote video done this way needs no additional installation or setup work.
 
 Live Demo - test drive this app at:  
 [https://xmrrnz.manukautech.info](https://xmrrnz.manukautech.info) - Server located in Auckland, New Zealand    
