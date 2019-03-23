@@ -41,7 +41,9 @@ namespace XMRemoteRobot
 			if (env.IsDevelopment())
 			{
 				app.UseDeveloperExceptionPage();
-				app.UseBrowserLink();
+                //2019-03-13 JPC comment-out UseBrowserLink() because it throws errors
+                //on updating from Core 2.1 to Core 2.2
+				//app.UseBrowserLink();
 			}
 			else
 			{
