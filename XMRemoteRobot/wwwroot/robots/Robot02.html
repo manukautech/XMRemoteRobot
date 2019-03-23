@@ -18,102 +18,125 @@
     <script src="signalr.min.js"></script>
 
 	<script>
-        var _timer
 		var _allowLocation = true;
 		var _oeCommanderId;
-		var _robotMode = "None";
-		var _videoMimeType = 'video/webm';
 		var _speechResponse = "";
 
-		var RobotMode = {
-			None: "None",
-			LiveStream: "LiveStream",
-			MotionDetect: "MotionDetect",
-			SpeechRecognition: "SpeechRecognition"
-		}
+        //2019-03-23 JPC replacing these with individual booleans because they can co-exist
+        //var RobotMode = {
+		//	None: "None",
+		//	LiveStream: "LiveStream",
+		//	MotionDetect: "MotionDetect",
+		//	SpeechRecognition: "SpeechRecognition"
+        //      }
+        //  var _robotMode = RobotMode.LiveStream;
 
 		// 20171015 SA Variable to store the robot's current location information
         var _currentPosition;
+        var d = new Date();
+        var _previousSendVision = d.getTime();
+        var _previousSendData = d.getTime();
 
-        var _message;
+        var _signal;
+
+        //2019-03-13 JPC remote vision is now switchable - starts as "on"
+        var _isVision = true;
 
         const connection
             = new signalR.HubConnectionBuilder().withUrl("/robothub").build();
 
 		//Called after application is started.
 		function onStart() {
-			document.getElementById("gx1x3").style.backgroundColor = "firebrick";
-			document.getElementById("gx2x3").style.backgroundColor = "firebrick";
 			_oeCommanderId = document.getElementById("CommanderId");
             getLocation();
             //
             try {
                 connection.start();
+                initVideo();
             } catch (err) {
                 alert("Error on first connection: " + err.message);
             }
         }
 
         //receive from server
-        connection.on("XSignal", function (messageReceived) {
-            _message = messageReceived;
+        connection.on("XSignal", function (signalReceived) {
+            _signal = signalReceived;
             receive();
         });
 
         function register() {
-            var oMessage = new Object();
-            oMessage.categoryid = 6;  //register a robot on the server
-            oMessage.commanderid = parseInt(document.getElementById("CommanderId").value);
-            oMessage.robotid = oMessage.commanderid + 100;
-            oMessage.accesskey = "demo-access-key";
-            _message = JSON.stringify(oMessage);
+            var signalObject = new Object();
+            signalObject.categoryid = 6;  //register a robot on the server
+            signalObject.commanderid = parseInt(document.getElementById("CommanderId").value);
+            signalObject.robotid = signalObject.commanderid + 100;
+            signalObject.accesskey = "demo-access-key";
+            _signal = JSON.stringify(signalObject);
             //alert(message);
-            connection.invoke("XSignal", _message);
+            connection.invoke("XSignal", _signal);
         }
 
         //send to server
-        function send() {
-            var oMessage = new Object();
-            oMessage.categoryid = 2;
-            oMessage.commanderid = document.getElementById("CommanderId").value;
-            oMessage.robotid = parseInt(oMessage.commanderid) + 100;
-            oMessage.accesskey = "demo-access-key";
+        function send(img) {
+            var signalObject = new Object();
+            signalObject.categoryid = 2;
+            signalObject.commanderid = document.getElementById("CommanderId").value;
+            signalObject.robotid = parseInt(signalObject.commanderid) + 100;
+            signalObject.accesskey = "demo-access-key";
 
             var oXData = new Object();
             oXData.status = 300;
             var d = new Date();
             oXData.timestamp = d;
-            if (_currentPosition) {
+            var tnow = d.getTime();
+
+            if ((tnow - _previousSendData) >= 5000  && _currentPosition) {
                 oXData.latitude = _currentPosition.coords.latitude;
                 oXData.longitude = _currentPosition.coords.longitude;
             } else {
                 oXData.response = "Location - no information";
             }
+            oXData.imgbase64 = img;
             //oXData.speechResponse = _speechResponse;
-            oMessage.xdata = oXData;
+            signalObject.xdata = oXData;
 
-            _message = JSON.stringify(oMessage);
-            //alert(_message);
-            connection.invoke("XSignal", _message);
+            _signal = JSON.stringify(signalObject);
+            //alert(_signal);
+            connection.invoke("XSignal", _signal);
         }
 
         function receive() {
-            //alert(_message);
+            //alert(_signal);
 
-            document.getElementById("XMessage").value = _message;
-
-            var oMessage = JSON.parse(_message);
-            ////20180803 JPC changed check for existence of vx1x1
+            var signalObject = JSON.parse(_signal);
+            ////2018-08-03 JPC changed check for existence of vx1x1
             //ref: https://humanwhocodes.com/blog/2010/07/27/determining-if-an-object-property-exists/
             //  Change child object name from command to xdata
-            if ("vx1x1" in oMessage.xdata) {
-                setPatchLevel("gx1x1", oMessage.xdata.vx1x1);
-                setPatchLevel("gx1x2", oMessage.xdata.vx1x2);
-                setPatchLevel("gx2x1", oMessage.xdata.vx2x1);
-                setPatchLevel("gx2x2", oMessage.xdata.vx2x2);
+            if ("vx1x1" in signalObject.xdata) {
+                if (robotType == "bigtrak") {
+                    setPatchLevel("gx1x1", signalObject.xdata.vx1x1);
+                    setPatchLevel("gx1x2", signalObject.xdata.vx1x2);
+                    setPatchLevel("gx2x1", signalObject.xdata.vx2x1);
+                    setPatchLevel("gx2x2", signalObject.xdata.vx2x2);
+                } else if (robotType == "roxie") {
+                    setPatchLevel("rx1x1", signalObject.xdata.vx1x1);
+                    setPatchLevel("rx1x2", signalObject.xdata.vx1x2);
+                    setPatchLevel("rx2x1", signalObject.xdata.vx2x1);
+                    setPatchLevel("rx2x2", signalObject.xdata.vx2x2);
+                }
             }
-            // send response with location info
-            send();
+            // send response with remote vision image and location info
+            var d = new Date();
+            var tnow = d.getTime();
+
+            if ("isvision" in signalObject) _isVision = signalObject.isvision;
+            if (_isVision) {
+                if (tnow - _previousSendVision >= 166) {
+                    _previousSendVision = tnow;
+                    capture();
+                }
+            } else {
+                document.getElementById("XSignal").value = "..." + _signal.slice(-100);
+            }
         }
 
         // 20171015 SA Continuously watch the position of the device and call the showPosition function
@@ -123,7 +146,7 @@
             }
         }
 
-        // 20171015 SA Store the robot's current location in currentPosition as soon as it is found
+        // 2017-10-15 SA Store the robot's current location in currentPosition as soon as it is found
         function showPosition(position) {
             if (_allowLocation)
                 _currentPosition = position;
@@ -143,7 +166,7 @@
 	</script>
 
 	<style>
-		/*20170806 JPC
+		/*2017-08-06 JPC
 			The font-size for selector * defines the em
 			and so sets all significant scaling
 			Fine-tune the font-size to get the light patches
@@ -158,15 +181,18 @@
 			background-color: black;
 		}
 
-		/*3 x 2 simplest light patch design */
-		table {
+		#BigTrak, #Roxie {
 			position: absolute;
-			top: 15em;
-			width: 19.5em;
-			height: 13em;
+			top: 30em;
+			width: 22em;
 			/*gives thin blue line effect between cells, good for adjusting alignment with the LDRs*/
 			background-color: blue;
 		}
+
+        table {
+            width: 100%;
+            height: 100%;
+        }
 
 		td {
 			box-sizing: border-box;
@@ -175,51 +201,136 @@
 			font-size: 0.4em;
 		}
 
-		textarea {
-			margin-top: 425px;
-		}
-
 		#robot-eyes {
 			position: absolute;
-			margin-top: 25px;
-			width: 295px;
+			margin-top: 1.5em;
+			width: 22em;
 		}
 
-		video {
-			height: 0;
-			width: 0;
-		}
-
-		#motion {
-			visibility: hidden;
-		}
 	</style>
 </head>
 
 <!-- variation from "DroidScript" where onload=app.onStart() -->
 <body onload="onStart();">
-	<img id="robot-eyes" src="../images/cute-eyes.gif" />
-	<textarea id="XMessage" cols="30" rows="7"></textarea>
-	<br /><br />
-	<input type="text" style="width:4em" id="CommanderId" value="0" />
-	<span style="color:white"> &lt;-- CommanderId
+    <img id="robot-eyes" src="../images/cute-eyes.gif" />
+
+    <!-- 2019-03-23 JPC 4 patches horizontally
+         in order to control the "BigTrak Rover robot"   -->
+    <div id="BigTrak" style="height:7em">
+        <table>
+            <tr>
+                <td id="gx2x2">gx2x1</td>
+                <td id="gx1x1">gx1x2</td>
+                <td id="gx1x2">gx1x1</td>
+                <td id="gx2x1">gx2x2</td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- 2019-03-23 JPC or change to 2 x rows of 3 patches
+         for our own "Roxie the Robot" -->
+    <div id="Roxie" style="display:none;height:12em">
+        <table>
+            <tr>
+                <td id="rx1x1">rx1x1</td>
+                <td id="rx1x2">rx1x2</td>
+                <td id="rx1x3" style="background-color: black">rx1x3</td>
+            </tr>
+            <tr>
+                <td id="rx2x1">rx2x1</td>
+                <td id="rx2x2">rx2x2</td>
+                <td id="rx2x3" style="background-color: black">rx2x3</td>
+            </tr>
+        </table>
+    </div>
+    <!-- Big margin here sets controls position -->
+    <input type="text" style="margin-top: 15em;width:3em" id="CommanderId" value="0" />
+    <span style="color:white">
+        &lt;--CommanderId
         <button onclick="register()">Register</button>
     </span>
+    <br /><br />
+    <!-- 2019-03-13 JPC video and canvas to transmit video-as-images -->
+    <video id="xcam" muted autoplay style="width:3em;"></video>
+    &nbsp;<button onclick="goBigTrak();">BigTrak</button>
+    &nbsp;<button onclick="goRoxie();">Roxie</button>
+    <br />
+    <br />
+    <textarea id="XSignal" cols="30" rows="5"></textarea>
+    <br />
+    <canvas id="xcapture" width="360" height="480" style="visibility: hidden"></canvas>
 
-	<table>
-		<tr>
-			<td id="gx1x1">gx1x1</td>
-			<td id="gx1x2">gx1x2</td>
-			<td id="gx1x3">gx1x3</td>
-		</tr>
-		<tr>
-			<td id="gx2x1">gx2x1</td>
-			<td id="gx2x2">gx2x2</td>
-			<td id="gx2x3">gx2x3</td>
-		</tr>
-	</table>
 
-	<script src="https://code.jquery.com/jquery-3.2.1.min.js" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js" crossorigin="anonymous"></script>
 
+    <script>
+        //Camera operations
+        var captureVideo = document.getElementById("xcam");
+        var captureCanvas = document.getElementById("xcapture");
+        var captureContext;
+        var captureWidth = 360;
+        var captureHeight = 480;
+        var captureInterval;
+
+        var constraints = {
+            audio: false,
+            video: { facingMode: "user", width: captureWidth, height: captureHeight }
+        };
+
+        //display
+        var robotType = "bigtrak";
+
+        function initVideo() {
+            navigator.mediaDevices.getUserMedia(constraints)
+                .then(initSuccess)
+                .catch(initError);
+        }
+
+        function initError(error) {
+            alert(error);
+        }
+
+        function initSuccess(stream) {
+            // streaming takes a moment to start
+            captureVideo.addEventListener('canplay', startComplete);
+            captureVideo.srcObject = stream;
+            captureCanvas.width = captureWidth;
+            captureCanvas.height = captureHeight;
+            captureContext = captureCanvas.getContext('2d');
+        }
+
+        function startComplete() {
+            captureVideo.removeEventListener('canplay', startComplete);
+            //2019-03-13 finding that JavaScript works reliably with only 1 timer in a high demand system
+            //That timer is in the human commander code
+            //This robot code slaves to the timer driven signals received from the human commander
+            //captureInterval = setInterval(capture, 166);
+        }
+
+        function capture() {
+            captureContext.drawImage(captureVideo, 0, 0);
+            var imgBase64 = captureCanvas.toDataURL("image/jpeg", 0.3);
+            //max string transmission over SignalR is 32700 characters
+            if (imgBase64.length > 32700) return;
+            //Quick test only
+            document.getElementById("XSignal").value = imgBase64.length + " " + imgBase64.slice(900, 910);
+            send(imgBase64);
+        }
+
+        //display and coding for "BigTrak Rover"
+        function goBigTrak() {
+            robotType = "bigtrak";
+            document.getElementById("BigTrak").style.display = "block";
+            document.getElementById("Roxie").style.display = "none";
+        }
+
+        //display and coding for "Roxie the Robot"
+        function goRoxie() {
+            robotType = "roxie";
+            document.getElementById("BigTrak").style.display = "none";
+            document.getElementById("Roxie").style.display = "block";
+        }
+
+    </script>
 </body>
 </html>
