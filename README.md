@@ -30,7 +30,7 @@ https://www.citrenz.ac.nz/conferences/2018/pdf/2018CITRENZ_1_Afrin_Robot.pdf
 
  
 Recent version changes:  
-2.2  - Enable "remote vision" as in video by capturing and sending still images over SignalR
+2.2  - Enable "remote vision" as in video by capturing and sending still images over SignalR  
 &nbsp;&nbsp;&nbsp;&nbsp;  at a nominal 6 frames per second.  
 &nbsp;&nbsp;&nbsp;&nbsp;  We want this one web app to do it all including simple remote vision   
 &nbsp;&nbsp;&nbsp;&nbsp;  with no additional installations or special setups needed.  
