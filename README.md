@@ -6,11 +6,11 @@ Live Demo - test drive this app at:
 [https://xmrrae.azurewebsites.net](https://xmrrae.azurewebsites.net) - Server located in Azure "Australia East"  
 [https://xmrrwu.azurewebsites.net](https://xmrrwu.azurewebsites.net) - Server located in Azure "West US"   
 You can see the latency effect at different distances.  
-For pages "Test01" and "Test02", commands travel from the left side of the page, to the server, then back to the robot code separated into an iframe on the right side of the page. Or to your smartphone-acting-as-robot when you navigate that to pages "Robot01" or "Robot02". Therefore multiply the distance to the server x 2 for the remote control distance.
+For pages "Test01" and "Test02", commands travel from the left side of the page, to the server, then back to the robot code separated into an iframe on the right side of the page. For a better test follow the instructions on the right and open a second copy of the website again in a separate browser window. Or open this website in 2 smartphones. The commander/robot pages are Test01/Robot01 and Test02/Robot02. The remote control distance is the distance to the server x 2.
 
-From version 2.0 we have moved from HTTP to Websockets-SignalR. This is delivering a big improvement in latency - as in delay in remote control and monitoring. Example latency results are 10ms on local area networks, and 70ms over a distance of 4000km. With version 02 we route between commanders and robots with an in-memory "dictionary" object. We have removed the database in this version. That also removes logging and some potential future elements. Not having a database does however make setup and hosting easier. XMRemoteRobot hosts well on the free and low cost Azure shared hosting websites.
+For version 2.0 and above we have moved from HTTP to Websockets-SignalR. This is delivering a big improvement in latency, ie shorter time delays. Example latency results are 10ms on local area networks, and 70ms over a distance of 4000km. With version 02 we route between commanders and robots with an in-memory "dictionary" object. We have removed the database in this version. That also removes logging and some potential future elements. Not having a database does however make setup and hosting easier. XMRemoteRobot hosts well on the free and low cost Azure shared hosting websites.
 
-Run XMRemoteRobot on a Windows machine with Visual Studio 2017 installed. We use the "Community Edition" which is free of charge for education, individuals and small businesses. Also download and install ".NET Core 2.2 SDK" from:
+Run XMRemoteRobot code on a Windows machine with Visual Studio 2017 installed. We use the "Community Edition" which is free of charge for education, individuals and small businesses. Also download and install ".NET Core 2.2 SDK" from:
 [https://www.microsoft.com/net/download/core](https://www.microsoft.com/net/download/core)  
 If you are running the full IIS Webserver on your test machine, you will also need to download and install ".NET Core 2.2 Runtime".  
 
@@ -28,6 +28,9 @@ https://www.citrenz.ac.nz/conferences/2018/pdf/2018CITRENZ_1_Afrin_Robot.pdf
 
  
 Recent version changes:  
+2.2  - Enable "remote vision" as in video by capturing and sending still images over SignalR
+&nbsp;&nbsp;&nbsp;&nbsp;  at a nominal 6 frames per second.
+&nbsp;&nbsp;&nbsp;&nbsp;  We want this one app to do it all including simple remote vision with no special setups needed.
 2.1  - Enable app clients by adding CORS permissions for them  
 &nbsp;&nbsp;&nbsp;&nbsp;  - Update asp.net core runtime from 2.1.2 to 2.1.5  
 2.0   - Extensive rewrite moving from HTTP to SignalR-Websockets. Replace database with an in-memory object. 
