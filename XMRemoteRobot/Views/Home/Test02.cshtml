@@ -31,7 +31,15 @@
 
         @*New parent column to display robot simulator on the right on medium to large screens*@
         <div class="col-md-6" style="padding-left:2em">
-            <div id="robotMessage" style="padding:2em;display:none">
+            <div id="robotRemote" style="padding-left:2em;display:none">
+                <b>Remote Robot</b>
+                <br />
+                Remote Vision: <button onclick="_isVision = true;">On</button>
+                &nbsp;<button onclick="_isVision = false;_rvid.src='../images/vidPlaceholder.jpg'">Off</button>
+                <br />
+                <img id="rvid" style="width:80%;" src="../images/vidPlaceholder.jpg" />
+                <br /><br />
+                <div id="robotSignal"></div>
             </div>
             <div id="robotContainer">
                 <p><b>Robot Client</b></p>
@@ -56,15 +64,25 @@
 @*20180728 JPC convert from Ajax long polling to SignalR*@
 <script src="~/robots/signalr.min.js"></script>
 
+@* 2019-01-16 JPC Change of naming convention for SignalR "signalObject" and "message"
+    Note that we use the keywords "signal", "request" or "response" for the complete JSON
+    string, depending on context, and "message" as one of the child elements,
+    usually for descriptive text.
+    Ref: document "Lessons from Robots about JSON_v20190116.docx" that should be packaged
+    with "XMRemoteRobot"
+*@
+
 <script type="text/javascript">
     var _oeCommanderId;
-    var _message = "";
+    var _signal = "";
 
-    //20180805 DOM objects 
+    //20180805 DOM objects
     var _oeCommanderId;
     var _oeRobotIframe;
-    var _oeRobotMessage;
+    var _oerobotSignal;
+    var _oeRobotRemote;
     var _oeContainer;
+    var _sendCycle = setInterval(send, 125);
 
     //20180803 JPC new approach
     var _accessKey = "demo-access-key";
@@ -72,8 +90,6 @@
     const connection
         = new signalR.HubConnectionBuilder().withUrl("/robothub").build();
 
-    var oeCircle, oeDriveStatus;
-    var _gamepadTimer;
 
     //mouse event tracking
     var _wx = 0;
@@ -81,7 +97,10 @@
     var map, marker;
     //20180805 JPC change default UI to mouse-circle
     var _gamepadMode = false;
-    
+
+    //2019-03-13 JPC remote vision
+    var _isVision = false;
+
     //var _robotMode = 'None';
     //var RobotMode = {
     //    None: "None",
@@ -93,9 +112,12 @@
     window.onload = function () {
         _oeCommanderId = document.getElementById("CommanderId");
         _oeRobotIframe = document.getElementById("robotIframe");
-        _oeRobotMessage = document.getElementById("robotMessage");
+        _oerobotSignal = document.getElementById("robotSignal");
+        _oeRobotRemote = document.getElementById("robotRemote");
         _oeContainer = document.getElementById("robotContainer");
-        window.setTimeout(onloadDelay, 200);
+        //video from remote robot
+        _rvid = document.getElementById("rvid");
+        window.setTimeout(onloadDelay, 125);
     }
 
     function onloadDelay() {
@@ -109,64 +131,69 @@
     }
 
     //receive from server
-    connection.on("XSignal", function (messageReceived) {
-        _message = messageReceived;
+    connection.on("XSignal", function (signalReceived) {
+        _signal = signalReceived;
         receive();
     });
 
     function receive() {
-        //alert(_message);
+        //alert(_signal);
 
-        //document.getElementById("XMessage").value = _message;
+        //document.getElementById("XSignal").value = _signal;
         ////blink effect
-        //document.getElementById("XMessage").style.backgroundColor = "rgb(255, 200, 200)";
+        //document.getElementById("XSignal").style.backgroundColor = "rgb(255, 200, 200)";
         //window.setTimeout(unblink, 200);
-        var oMessage = JSON.parse(_message);
+        var signalObject = JSON.parse(_signal);
 
         //Case of success with registration
-        if (oMessage.categoryid == 4 && oMessage.commanderid > 0) {
-            registerProcess(oMessage)
-        } else if ("latitude" in oMessage.xdata) {
-            moveMarker(oMessage.xdata.latitude, oMessage.xdata.longitude);
+        if (signalObject.categoryid == 4 && signalObject.commanderid > 0) {
+            registerProcess(signalObject)
+        } else if ("latitude" in signalObject.xdata) {
+            moveMarker(signalObject.xdata.latitude, signalObject.xdata.longitude);
         }
 
-        //Message contains alert
-        if ("alert" in oMessage) {
-            alert(oMessage.alert);
+        ////2019-03-13 JPC remote vision
+        if ("imgbase64" in signalObject.xdata && _isVision) {
+            _rvid.src = signalObject.xdata.imgbase64;
+        }
+
+        //Signal contains alert
+        if ("alert" in signalObject) {
+            alert(signalObject.alert);
         }
     }
 
     //request server to allocate demo commanderid and setup communications
     function registerRequest() {
-        var oMessage = new Object();
-        oMessage.categoryid = 4;  //register a demo commander on the server
-        oMessage.commanderid = 0;
-        oMessage.robotid = 0;
-        oMessage.accesskey = _accessKey;
-        _message = JSON.stringify(oMessage);
-        //alert(_message);
-        connection.invoke("XSignal", _message);
+        var signalObject = new Object();
+        signalObject.categoryid = 4;  //register a demo commander on the server
+        signalObject.commanderid = 0;
+        signalObject.robotid = 0;
+        signalObject.accesskey = _accessKey;
+        _signal = JSON.stringify(signalObject);
+        //alert(_signal);
+        connection.invoke("XSignal", _signal);
     }
 
-    function registerProcess(oMessage) {
-        document.getElementById("CommanderId").value = oMessage.commanderid;
+    function registerProcess(signalObject) {
+        document.getElementById("CommanderId").value = signalObject.commanderid;
 
         //20170910 JPC config content in iframe from here in the parent.
         //ref: https://www.w3schools.com/jsref/prop_frame_contentdocument.asp
         //ref: https://developer.mozilla.org/en-US/docs/Web/API/GlobalEventHandlers/onload
         _oeRobotIframe.contentDocument.getElementById("CommanderId").value
-            = oMessage.commanderid;
+            = signalObject.commanderid;
         //note use of contentWindow to access JavaScript functions in an iframe
         _oeRobotIframe.contentWindow.register();
 
         //document.getElementById("robotIframe").contentWindow._allowLocation = false;
 
-        _oeRobotMessage.innerHTML =
-            "You can test on a different device e.g. smartphone by visiting this same website:<br />"
+        _oerobotSignal.innerHTML =
+            "You can test in a new window or on a different device e.g. smartphone by visiting this same website:<br />"
             + "<b>" + window.location.protocol + "//" + window.location.host + "/</b>"
             + "<br />then click on menu item 'Robot02' <br />"
-            + "You will need to enter your 'CommanderId' value into the device.<br />"
-            + "Your 'CommanderId' is <b>" + oMessage.commanderid + "</b>"
+            + "You will need to enter your 'CommanderId' value into the window or device.<br />"
+            + "Your 'CommanderId' is <b>" + signalObject.commanderid + "</b>"
             + "<br /> <br />"
             + "<input type='button' value='Back to Simulation' onclick='noIframe(false);' /><br/><br />";
 
@@ -174,35 +201,36 @@
             if (!_gamepadMode) {
                 _wx = e.clientX;
                 _wy = e.clientY;
-                send();
+                //data waits on standby then send on timer
             }
         }
     }
 
     //send to server
     function send() {
-        var oMessage = new Object();
-        oMessage.categoryid = 1; //commander sends to robot
-        oMessage.commanderid = parseInt(document.getElementById("CommanderId").value);
-        oMessage.robotid = oMessage.commanderid + 100;
-        oMessage.accesskey = _accessKey;
-        //oMessage.robotmode = _robotMode;
+        var signalObject = new Object();
+        signalObject.categoryid = 1; //commander sends to robot
+        signalObject.commanderid = parseInt(document.getElementById("CommanderId").value);
+        signalObject.robotid = signalObject.commanderid + 100;
+        signalObject.accesskey = _accessKey;
+        //2019-03-23 JPC can switch remote vision on and off
+        signalObject.isvision = _isVision;
 
         //Monitor currently not used
         //document.getElementById("XData").innerHTML = JSON.stringify(oXData);
         if (_gamepadMode) {
-            oMessage.xdata = gamepadData()
-            if (oMessage.xdata.isvalid == 0) {
+            signalObject.xdata = gamepadData()
+            if (signalObject.xdata.isvalid == 0) {
                 changeInput();
-                alert("GamePad is not responding or does not have an XBox-compatible output." 
-                + " If you have just started this page and you have a GamePad plugged in, it can work to wait 5 seconds, move the left joystick, then try again.");
+                alert("GamePad is not responding or does not have an XBox-compatible output."
+                    + " If you have just started this page and you have a GamePad plugged in, it can work to wait 5 seconds, move the left joystick, then try again.");
                 return;
             }
         } else {
-            oMessage.xdata = mouseData();
+            signalObject.xdata = mouseData();
         }
-        _message = JSON.stringify(oMessage);
-        connection.invoke("XSignal", _message);
+        _signal = JSON.stringify(signalObject);
+        connection.invoke("XSignal", _signal);
     }
 
     function mouseData() {
@@ -300,11 +328,20 @@
         if (isChange) {
             _oeRobotIframe.src = "#";
             _oeContainer.style.display = "none";
-            _oeRobotMessage.style.display = "block";
-            _oeRobotMessage.style.backgroundColor = "lightgrey";
+            _oeRobotRemote.style.display = "block";
+            _oeRobotRemote.style.backgroundColor = "lightgrey";
+            //2019-03-13 JPC remote vision
+            _rvid.src = "../images/vidPlaceholder.jpg";
+            //0.5 second delay until displaying remote vision
+            //to prevent seeing a "leftover" image from the simulation
+            window.setTimeout(startVision, 500);
         } else {
             window.location.replace(window.location.href);
         }
+    }
+
+    function startVision() {
+        _isVision = true;
     }
 
     //toggle between mouse input and gamepad
@@ -317,9 +354,7 @@
             $('#gamepad-container').show();
             $("#btn-controller-change").html('Change to mouse');
             $('#uiLabel').innerHTML = "Human Commander - gamepad";
-            _gamepadTimer = setInterval(send, 100);
         } else {
-            clearInterval(_gamepadTimer);
             $('#mousePad').show();
             $('#gamepad-container').hide();
             $("#btn-controller-change").html('Change to gamepad');
