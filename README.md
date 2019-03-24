@@ -6,7 +6,6 @@ Big step up for Version 2.2 of 24 Mar 2019 - live video, see what the robot sees
 Live Demo - test drive this app at:   
 [https://xmrrae.azurewebsites.net](https://xmrrae.azurewebsites.net) - Server located in Azure "Australia East"  
 [https://xmrrwu.azurewebsites.net](https://xmrrwu.azurewebsites.net) - Server located in Azure "West US"   
-[https://xmrrnz.manukautech.info](https://xmrrnz.manukautech.info) - Server located in Auckland, New Zealand  
 You can see the latency effect at different distances.  
   
 For pages "Test01" and "Test02", commands travel from the left side of the page, to the server, then back to the robot code separated into an iframe on the right side of the page. For a better test follow the instructions on the right and open a second copy of the website in a separate browser window or on a smartphone. Or open this website in 2 smartphones. The commander/robot pages are Test01/Robot01 and Test02/Robot02. The remote control distance is the distance to the server x 2.
