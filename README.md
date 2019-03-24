@@ -30,11 +30,9 @@ https://www.citrenz.ac.nz/conferences/2018/pdf/2018CITRENZ_1_Afrin_Robot.pdf
 
  
 Recent version changes:  
-2.2  - Enable "remote vision" as in video by capturing and sending still images over SignalR  
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  at a nominal 6 frames per second.  
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  We want this one web app to do it all including simple remote vision   
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  with no additional installations or special setups needed.  
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  Also update of asp.net core runtime version to 2.2.0   
-2.1  - Enable app clients by adding CORS permissions for them  
-&nbsp;&nbsp;&nbsp;&nbsp;  - Update asp.net core runtime from 2.1.2 to 2.1.5  
-2.0   - Extensive rewrite moving from HTTP to SignalR-Websockets. Replace database with an in-memory object. 
+| ---- | ------------------------------------------------------------------------------------------------- |
+|2.2   |Enable "remote vision" as in video by capturing and sending still images over SignalR at a nominal 6 frames per second. We want this one web app to do it all including simple remote vision with no additional installations or special setups needed.|                 
+|      |Update of asp.net core runtime version to 2.2 |
+|2.1   |Enable app clients by adding "CORS" permissions for them.|  
+|      |Update asp.net core runtime from 2.1.2 to 2.1.5  |
+2.0    |Extensive rewrite moving from HTTP to SignalR-Websockets. Replace database with an in-memory object. |
