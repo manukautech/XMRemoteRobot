@@ -1,7 +1,9 @@
 # XMRemoteRobot Version 2.2
 A web service app which enables remote-control of near and distant devices via SignalR - a WebSockets framework.
 
-Big step up for Version 2.2 of 24 Mar 2019 - live video, see what the robot sees, achieved by capturing images from the robot (or any test device) camera at about 6 frames per second, and sending them over the same SignalR signals as remote control. This means this one app does it all. Remote video done this way needs no additional installation or setup work.
+Big step up for Version 2.2 of 24 Mar 2019 - live video, see what the robot sees, achieved by capturing images from the robot (or any test device) camera at about 6 frames per second, and sending them over the same SignalR signals as remote control. This means this one app does it all. Remote video done this way needs no additional installation or setup work.  
+Event: Sunday 12 Jan 2020. Successful live video from a New Zealand Rocketry Association enthusiast rocket flight.  
+[https://www.facebook.com/groups/nzrocketry/permalink/10162696440995696/](https://www.facebook.com/groups/nzrocketry/permalink/10162696440995696/)  
   
 Live Demo - test drive this app at:   
 [https://xmrrae.azurewebsites.net](https://xmrrae.azurewebsites.net) - Server located in Azure "Australia East"  
