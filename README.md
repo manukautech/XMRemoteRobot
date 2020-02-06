@@ -14,7 +14,7 @@ For pages "Test01" and "Test02", commands travel from the left side of the page,
 
 For version 2.0 and above we have moved from HTTP to Websockets-SignalR. This is delivering a big improvement in latency, ie shorter time delays. Example latency results are 10ms on local area networks, and 70ms over a distance of 4000km. With version 02 we route between commanders and robots with an in-memory "dictionary" object. We have removed the database in this version. That also removes logging and some potential future elements. Not having a database does however make setup and hosting easier. XMRemoteRobot hosts well on the free and low cost Azure shared hosting websites.
 
-Run XMRemoteRobot code on a Windows machine with Visual Studio 2017 installed. We use the "Community Edition" which is free of charge for education, individuals and small businesses. Also download and install ".NET Core 2.2 SDK" from:
+Run XMRemoteRobot code on a Windows machine with Visual Studio 2019 or 2017 installed. We use the "Community Edition" which is free of charge for education, individuals and small businesses. Also download and install ".NET Core 2.2 SDK" from:
 [https://www.microsoft.com/net/download/core](https://www.microsoft.com/net/download/core)  
 If you are running the full IIS Webserver on your test machine, you will also need to download and install ".NET Core 2.2 Runtime".  
 
